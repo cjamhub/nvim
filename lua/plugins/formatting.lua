@@ -16,6 +16,7 @@ return {
 		formatters_by_ft = {
 			lua = { "stylua" },
 			go = { "gofmt" },
+			rust = { "rustfmt" },
 		},
 		formatters = {
 			gofmt = {
