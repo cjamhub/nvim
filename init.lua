@@ -1,9 +1,9 @@
-vim.g.mapleader = ' '
-vim.g.maplocalleader = ' '
+vim.g.mapleader = " "
+vim.g.maplocalleader = " "
 
 -- clipboard
 vim.schedule(function()
-  vim.o.clipboard = 'unnamedplus'
+	vim.o.clipboard = "unnamedplus"
 end)
 
 -- Enable break indent
@@ -23,15 +23,15 @@ vim.o.signcolumn = "yes"
 -- font
 vim.g.have_nerd_font = true
 -- for color
-vim.opt.termguicolors  = true
+vim.opt.termguicolors = true
 
 -- mouse
-vim.o.mouse = 'a'
+vim.o.mouse = "a"
 
 -- basic keymaps
-vim.keymap.set('n', '<Leader>e', ':e%:h<CR>')
-vim.keymap.set('n', '<C-k>', ':tabnext<CR>')
-vim.keymap.set('n', '<C-j>', ':tabprev<CR>')
+vim.keymap.set("n", "<Leader>e", ":e%:h<CR>")
+vim.keymap.set("n", "<C-k>", ":tabnext<CR>")
+vim.keymap.set("n", "<C-j>", ":tabprev<CR>")
 
 require("config.lazy")
 
