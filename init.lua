@@ -34,3 +34,5 @@ vim.keymap.set('n', '<C-k>', ':tabnext<CR>')
 vim.keymap.set('n', '<C-j>', ':tabprev<CR>')
 
 require("config.lazy")
+
+vim.cmd.colorscheme("catppuccin")
