@@ -1,0 +1,16 @@
+{
+    "diagnostics": {
+        "globals": ["vim"]
+    },
+    "workspace": {
+        "library": [
+            "/Applications/Neovim.app/Contents/Resources/nvim/runtime/lua",
+            "/Users/jam/.local/share/nvim/lazy",
+            "/Users/jam/.config/nvim/lua"
+        ],
+        "checkThirdParty": false
+    },
+    "telemetry": {
+        "enable": false
+    }
+}
