@@ -35,21 +35,6 @@ return {
 					function(server_name)
 						lspconfig[server_name].setup({
 							capabilities = caps,
-							on_attach = function(client, bufnr)
-								-- your keymaps here, e.g.
-								local bufmap = function(mode, lhs, rhs)
-									vim.api.nvim_buf_set_keymap(
-										bufnr,
-										mode,
-										lhs,
-										rhs,
-										{ silent = true, noremap = true }
-									)
-								end
-								bufmap("n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>")
-								bufmap("n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>")
-								bufmap("n", "gr", "<cmd>lua vim.lsp.buf.references()<CR>")
-							end,
 						})
 					end,
 					-- Solidity LSP specific configuration
@@ -77,20 +62,6 @@ return {
 									},
 								},
 							},
-							on_attach = function(client, bufnr)
-								local bufmap = function(mode, lhs, rhs)
-									vim.api.nvim_buf_set_keymap(
-										bufnr,
-										mode,
-										lhs,
-										rhs,
-										{ silent = true, noremap = true }
-									)
-								end
-								bufmap("n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>")
-								bufmap("n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>")
-								bufmap("n", "gr", "<cmd>lua vim.lsp.buf.references()<CR>")
-							end,
 						})
 					end,
 				},
@@ -185,4 +156,12 @@ return {
 			})
 		end,
 	},
+
+	vim.keymap.set("n", "gd", ":lua vim.lsp.buf.definition()<CR>", {}),
+	vim.keymap.set("n", "gD", ":lua vim.lsp.buf.declaration()<CR>", {}),
+	vim.keymap.set("n", "K", ":lua vim.lsp.buf.hover()<CR>", {}),
+	vim.keymap.set("n", "gi", ":lua vim.lsp.buf.implementation()<CR>", {}),
+	vim.keymap.set("n", "<leader>rn", ":lua vim.lsp.buf.rename()<CR>", {}),
+	vim.keymap.set("n", "<leader>ca", ":lua vim.lsp.buf.code_action()<CR>", {}),
+	vim.keymap.set("n", "gr", ":lua vim.lsp.buf.references()<CR>", {}),
 }
