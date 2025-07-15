@@ -17,12 +17,18 @@ return {
 			lua = { "stylua" },
 			go = { "gofmt" },
 			rust = { "rustfmt" },
+			-- solidity = { "forge_fmt" },
 		},
 		formatters = {
 			gofmt = {
 				command = "gofmt",
 				args = { "-s" },
 			},
+			-- forge_fmt = {
+			-- 	command = "forge",
+			-- 	args = { "fmt", "--raw", "-" },
+			-- 	stdin = true,
+			-- },
 		},
 		format_on_save = {
 			timeout_ms = 500,

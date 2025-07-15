@@ -10,7 +10,23 @@ return {
 
         telescope.setup {
             defaults = {
-                path_display = { 'smart' }
+                path_display = { 'smart' },
+                layout_config = {
+                    width = 0.9,
+                    height = 0.9,
+                    preview_width = 0.6,
+                },
+                wrap_results = true,
+            },
+            pickers = {
+                diagnostics = {
+                    theme = "ivy",
+                    wrap_results = true,
+                    layout_config = {
+                        height = 0.4,
+                    },
+                    line_width = "full",
+                },
             },
             extensions = {
                 fzf = {

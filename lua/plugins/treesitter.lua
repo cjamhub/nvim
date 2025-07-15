@@ -11,6 +11,7 @@ return {
             "go",
             "markdown",
             "circom",
+            "solidity",
         },
         highlight = {
             enable = true

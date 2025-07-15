@@ -7,6 +7,7 @@ return {
 				"lua_ls",
 				"rust_analyzer",
 				"gopls",
+				"solidity_ls",
 			},
 		},
 		dependencies = {
@@ -36,6 +37,47 @@ return {
 							capabilities = caps,
 							on_attach = function(client, bufnr)
 								-- your keymaps here, e.g.
+								local bufmap = function(mode, lhs, rhs)
+									vim.api.nvim_buf_set_keymap(
+										bufnr,
+										mode,
+										lhs,
+										rhs,
+										{ silent = true, noremap = true }
+									)
+								end
+								bufmap("n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>")
+								bufmap("n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>")
+								bufmap("n", "gr", "<cmd>lua vim.lsp.buf.references()<CR>")
+							end,
+						})
+					end,
+					-- Solidity LSP specific configuration
+					solidity_ls = function()
+						lspconfig.solidity_ls.setup({
+							capabilities = caps,
+							cmd = { "solidity-ls", "--stdio" },
+							filetypes = { "solidity" },
+							root_dir = require("lspconfig").util.root_pattern(
+								"hardhat.config.js",
+								"hardhat.config.ts",
+								"truffle-config.js",
+								"remappings.txt",
+								"truffle.js",
+								"foundry.toml",
+								".git"
+							),
+							settings = {
+								solidity = {
+									includePath = {
+										"node_modules",
+									},
+									remappings = {
+										["@openzeppelin"] = "node_modules/@openzeppelin",
+									},
+								},
+							},
+							on_attach = function(client, bufnr)
 								local bufmap = function(mode, lhs, rhs)
 									vim.api.nvim_buf_set_keymap(
 										bufnr,
