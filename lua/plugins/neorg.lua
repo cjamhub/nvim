@@ -4,10 +4,20 @@ return {
     version = "*", -- Pin Neorg to the latest stable release
     config = function()
         vim.opt.conceallevel  = 2
+        
+        -- Disable auto-folding for neorg files
+        vim.api.nvim_create_autocmd("FileType", {
+            pattern = "norg",
+            callback = function()
+                vim.opt_local.foldenable = false
+            end,
+        })
+        
         require('neorg').setup {
             load = {
                 ['core.defaults'] = {},
                 ['core.concealer'] = {},
+                ['core.integrations.nvim-cmp'] = {},
                 ['core.dirman'] = {
                     config = {
                         workspaces = {
