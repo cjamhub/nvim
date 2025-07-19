@@ -35,4 +35,4 @@ vim.keymap.set("n", "<C-j>", ":tabprev<CR>")
 
 require("config.lazy")
 
-vim.cmd.colorscheme("catppuccin")
+vim.cmd.colorscheme("nord")
