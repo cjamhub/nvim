@@ -39,6 +39,12 @@ return {
 		map("n", "<leader>fg", require("telescope.builtin").live_grep, { desc = "Live Grep" })
 		map("n", "<leader>fb", require("telescope.builtin").buffers, { desc = "Buffers" })
 		map("n", "<leader>fh", require("telescope.builtin").help_tags, { desc = "Help Tags" })
+		map(
+			"n",
+			"<C-s>",
+			require("telescope.builtin").current_buffer_fuzzy_find,
+			{ desc = "Fyzzy Find Current Buffer" }
+		)
 		map("n", "<leader>fc", function()
 			require("telescope.builtin").diagnostics({ severity_bound = 0 })
 		end, { desc = "Diagnostics List" })
