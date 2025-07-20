@@ -22,8 +22,6 @@ vim.o.signcolumn = "yes"
 
 -- font
 vim.g.have_nerd_font = true
--- for color
-vim.opt.termguicolors = true
 
 -- mouse
 vim.o.mouse = "a"
@@ -35,4 +33,6 @@ vim.keymap.set("n", "<C-j>", ":tabprev<CR>")
 
 require("config.lazy")
 
+-- vim.o.background = "light"
+vim.opt.termguicolors = true
 vim.cmd.colorscheme("nord")

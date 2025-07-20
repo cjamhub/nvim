@@ -39,6 +39,7 @@ return {
 		map("n", "<leader>fg", require("telescope.builtin").live_grep, { desc = "Live Grep" })
 		map("n", "<leader>fb", require("telescope.builtin").buffers, { desc = "Buffers" })
 		map("n", "<leader>fh", require("telescope.builtin").help_tags, { desc = "Help Tags" })
+		map("n", "<leader>tcl", require("telescope.builtin").colorscheme, { desc = "Colorscheme" })
 		map(
 			"n",
 			"<C-s>",

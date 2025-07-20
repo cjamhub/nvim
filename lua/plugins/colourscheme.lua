@@ -20,4 +20,14 @@ return {
 		name = "gruvbox",
 		priority = 1000,
 	},
+	{
+		"maxmx03/solarized.nvim",
+		name = "solarized",
+		priority = 1000,
+	},
+	{
+		"maxmx03/solarized.nvim",
+		lazy = false,
+		priority = 1000,
+	},
 }
