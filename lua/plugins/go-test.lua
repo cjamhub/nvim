@@ -32,25 +32,25 @@ return {
 				require("neotest").run.run()
 			end, { desc = "Run nearest test" })
 
-			vim.keymap.set("n", "<leader>tf", function()
-				require("neotest").run.run(vim.fn.expand("%"))
-			end, { desc = "Run tests in current file" })
+			-- vim.keymap.set("n", "<leader>tf", function()
+			-- 	require("neotest").run.run(vim.fn.expand("%"))
+			-- end, { desc = "Run tests in current file" })
 
-			vim.keymap.set("n", "<leader>td", function()
-				require("neotest").run.run({ strategy = "dap" })
-			end, { desc = "Debug nearest test" })
+			-- vim.keymap.set("n", "<leader>td", function()
+			-- 	require("neotest").run.run({ strategy = "dap" })
+			-- end, { desc = "Debug nearest test" })
 
-			vim.keymap.set("n", "<leader>ts", function()
-				require("neotest").summary.toggle()
-			end, { desc = "Toggle test summary" })
+			-- vim.keymap.set("n", "<leader>ts", function()
+			-- 	require("neotest").summary.toggle()
+			-- end, { desc = "Toggle test summary" })
 
-			vim.keymap.set("n", "<leader>to", function()
+			vim.keymap.set("n", ",o", function()
 				require("neotest").output.open({ enter = true, auto_close = true, short = false })
 			end, { desc = "Show test output" })
 
-			vim.keymap.set("n", "<space>to", function()
-				require("neotest").output_panel.toggle()
-			end, { desc = "Toggle test output panel" })
+			-- vim.keymap.set("n", "<space>to", function()
+			-- 	require("neotest").output_panel.toggle()
+			-- end, { desc = "Toggle test output panel" })
 		end,
 	},
 }

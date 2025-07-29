@@ -5,6 +5,7 @@ return {
 		"nvim-lua/plenary.nvim",
 		"nvim-telescope/telescope-fzf-native.nvim",
 		build = "make", -- optional native FZF sorter
+		"nvim-telescope/telescope-project.nvim",
 	},
 	config = function()
 		local telescope = require("telescope")
@@ -31,8 +32,21 @@ return {
 					override_generic_sorter = true,
 					override_file_sorter = true,
 				},
+				project = {
+					base_dirs = {
+						"~/Workspace/Jam/",
+						"~/Workspace/Durham/",
+						"~/Workspace/xHubs/",
+						"~/.config/nvim/",
+					},
+					order_by = "asc",
+					hidden_files = true,
+					search_by = "title",
+				},
 			},
 		})
+
+		telescope.load_extension("project")
 
 		local map = vim.keymap.set
 		map("n", "<leader>ff", require("telescope.builtin").find_files, { desc = "Find Files" })
@@ -40,6 +54,7 @@ return {
 		map("n", "<leader>fb", require("telescope.builtin").buffers, { desc = "Buffers" })
 		map("n", "<leader>fh", require("telescope.builtin").help_tags, { desc = "Help Tags" })
 		map("n", "<leader>tcl", require("telescope.builtin").colorscheme, { desc = "Colorscheme" })
+		map("n", "<leader>fp", require("telescope").extensions.project.project, { desc = "Projects" })
 		map(
 			"n",
 			"<C-s>",
