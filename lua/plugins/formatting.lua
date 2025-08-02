@@ -18,6 +18,7 @@ return {
 			go = { "gofmt" },
 			rust = { "rustfmt" },
 			solidity = { "forge_fmt" },
+			json = { "prettier" },
 		},
 		formatters = {
 			gofmt = {
