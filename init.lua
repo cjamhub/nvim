@@ -36,3 +36,19 @@ require("config.lazy")
 -- vim.o.background = "light"
 vim.opt.termguicolors = true
 vim.cmd.colorscheme("nord")
+
+-- statusline
+local function git_branch()
+	local handle = io.popen("git rev-parse --abbrev-ref HEAD 2>/dev/null")
+	if handle then
+		local branch = handle:read("*l")
+		handle:close()
+		if branch and branch ~= "HEAD" then
+			return " " .. branch
+		end
+	end
+	return ""
+end
+
+vim.o.statusline = "%f %h%m%r%=%{v:lua.git_branch()} %y %p%% %l:%c"
+_G.git_branch = git_branch

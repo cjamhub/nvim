@@ -8,6 +8,7 @@ return {
 				"rust_analyzer",
 				"gopls",
 				"solidity_ls",
+				"ts_ls",
 			},
 		},
 		dependencies = {
@@ -18,6 +19,7 @@ return {
 				opts = {
 					ensure_installed = {
 						"stylua",
+						"prettier",
 					},
 				},
 			},

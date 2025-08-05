@@ -36,6 +36,7 @@ return {
 						"~/Workspace/Jam/",
 						"~/Workspace/Durham/",
 						"~/Workspace/xHubs/",
+						"~/Workspace/Stakestone/",
 						"~/.config/nvim/",
 					},
 					order_by = "asc",

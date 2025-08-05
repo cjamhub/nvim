@@ -19,6 +19,10 @@ return {
 			rust = { "rustfmt" },
 			solidity = { "forge_fmt" },
 			json = { "prettier" },
+			javascript = { "prettier" },
+			typescript = { "prettier" },
+			javascriptreact = { "prettier" },
+			typescriptreact = { "prettier" },
 		},
 		formatters = {
 			gofmt = {
