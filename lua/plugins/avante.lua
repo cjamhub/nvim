@@ -2,13 +2,7 @@ return {
   "yetone/avante.nvim",
   event = "VeryLazy",
   opts = {
-    provider = "claude",
-    providers = {
-      claude = {
-        endpoint = "https://api.anthropic.com",
-        model = "claude-sonnet-4-20250514",
-      },
-    },
+    provider = "copilot",
   },
   build = "make",
   dependencies = {
