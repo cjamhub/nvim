@@ -3,8 +3,10 @@ return {
 	tag = "0.1.8",
 	dependencies = {
 		"nvim-lua/plenary.nvim",
-		"nvim-telescope/telescope-fzf-native.nvim",
-		build = "make", -- optional native FZF sorter
+		{
+			"nvim-telescope/telescope-fzf-native.nvim",
+			build = "make",
+		},
 		"nvim-telescope/telescope-project.nvim",
 	},
 	config = function()
@@ -46,6 +48,7 @@ return {
 			},
 		})
 
+		telescope.load_extension("fzf")
 		telescope.load_extension("project")
 
 		local map = vim.keymap.set
