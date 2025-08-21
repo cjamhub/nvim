@@ -22,6 +22,11 @@ return {
 				wrap_results = true,
 			},
 			pickers = {
+				find_files = {
+					hidden = true,
+					no_ignore = true,
+					follow = true,
+				},
 				diagnostics = {
 					theme = "ivy",
 					wrap_results = true,
