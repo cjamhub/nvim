@@ -20,6 +20,16 @@ return {
 					height = 0.9,
 				},
 				wrap_results = true,
+				file_ignore_patterns = {
+					"node_modules/.*",
+					"%.git/.*",
+					"target/.*",
+					"build/.*",
+					"dist/.*",
+					"%.lock",
+					"package%-lock%.json",
+					"yarn%.lock",
+				},
 			},
 			pickers = {
 				find_files = {
