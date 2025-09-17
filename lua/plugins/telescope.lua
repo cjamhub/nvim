@@ -29,6 +29,10 @@ return {
 					"%.lock",
 					"package%-lock%.json",
 					"yarn%.lock",
+					"cache/.*",
+					"broadcast/.*",
+					"lib/.*",
+					"out/.*",
 				},
 			},
 			pickers = {

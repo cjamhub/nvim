@@ -11,19 +11,11 @@ return {
 			local dapui = require("dapui")
 
 			require("dap-go").setup({
-				dap_configurations = {
-					{
-						type = "go",
-						name = "Attach remote",
-						mode = "remote",
-						request = "attach",
-					},
-				},
 				delve = {
 					path = "dlv",
 					initialize_timeout_sec = 20,
 					port = "${port}",
-					args = {},
+					args = { "--check-go-version=false" },
 					build_flags = "",
 					detached = vim.fn.has("win32") == 0,
 				},
@@ -64,6 +56,13 @@ return {
 
 			vim.keymap.set("n", "<leader>db", dap.toggle_breakpoint, { desc = "Toggle breakpoint" })
 			vim.keymap.set("n", "<leader>dc", dap.continue, { desc = "Continue debugging" })
+			vim.keymap.set("n", "<leader>ds", function()
+				if vim.bo.filetype == "go" then
+					require("dap-go").debug_test()
+				else
+					dap.continue()
+				end
+			end, { desc = "Start debugging" })
 			vim.keymap.set("n", "<leader>di", dap.step_into, { desc = "Step into" })
 			vim.keymap.set("n", "<leader>do", dap.step_over, { desc = "Step over" })
 			vim.keymap.set("n", "<leader>dO", dap.step_out, { desc = "Step out" })
@@ -77,11 +76,6 @@ return {
 			vim.keymap.set("n", "<leader>dgl", function()
 				require("dap-go").debug_last_test()
 			end, { desc = "Debug last Go test" })
-			
-			vim.keymap.set("n", "<leader>dgr", function()
-				require("dap").run_to_cursor()
-			end, { desc = "Run to cursor" })
 		end,
 	},
 }
-

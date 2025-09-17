@@ -20,6 +20,7 @@ return {
 					ensure_installed = {
 						"stylua",
 						"prettier",
+						"delve",
 					},
 				},
 			},
