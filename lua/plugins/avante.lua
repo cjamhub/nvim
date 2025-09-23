@@ -19,7 +19,7 @@ return {
 					model = "claude-3-5-sonnet-20241022",
 					extra_request_body = {
 						temperature = 0,
-						max_tokens = 4096,
+						max_tokens = 2048,
 					},
 				},
 

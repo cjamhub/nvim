@@ -21,6 +21,8 @@ return {
 			["yaml"] = true,
 			["toml"] = true,
 			["markdown"] = true,
+			["AvanteInput"] = true,
+			["toggleterm"] = true,
 		}
 
 		-- Key mappings for Copilot

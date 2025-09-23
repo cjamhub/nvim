@@ -1,1 +1,44 @@
+# Solidity compiler
 *soljson-latest.js
+
+# Environment files
+.env*
+!.env.example
+
+# Logs and temporary files
+*.log
+*.tmp
+*.backup
+*~
+
+# Lazy.nvim lock file (contains plugin versions)
+lazy-lock.json
+
+# Debug files
+*.dmp
+debug.log
+
+# API keys and secrets (if accidentally created)
+secrets/
+keys/
+*.key
+*.secret
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Personal notes
+TODO.md
+NOTES.md
+scratch/
+
+# Plugin data that shouldn't be shared
+.nvim/
+session/
+*.session
