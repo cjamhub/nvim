@@ -33,5 +33,3 @@ A system for expanding small “templates” with placeholders and jump-points.
 
 ### Formatting Helpers
 ### Install & Manager tools (like Mason)
-
-
