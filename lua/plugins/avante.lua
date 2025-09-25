@@ -11,7 +11,7 @@ return {
 			-- Option 2: Change to "copilot" if you have GitHub Copilot subscription
 			-- Option 3: Use local models with "ollama" (free but requires local setup)
 			-- Example: provider = "openai", auto_suggestions_provider = "openai"
-			provider = "openai",
+			provider = "copilot",
 			-- auto_suggestions_provider = "claude",
 			providers = {
 				claude = {
@@ -32,7 +32,7 @@ return {
 					timeout = 30000,
 					extra_request_body = {
 						temperature = 0,
-						max_tokens = 4096,
+						max_tokens = 2048,
 					},
 				},
 				-- Copilot configuration (ready to use when you switch)
