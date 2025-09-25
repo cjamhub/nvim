@@ -11,8 +11,8 @@ return {
 			-- Option 2: Change to "copilot" if you have GitHub Copilot subscription
 			-- Option 3: Use local models with "ollama" (free but requires local setup)
 			-- Example: provider = "openai", auto_suggestions_provider = "openai"
-			provider = "claude",
-			auto_suggestions_provider = "claude",
+			provider = "openai",
+			-- auto_suggestions_provider = "claude",
 			providers = {
 				claude = {
 					endpoint = "https://api.anthropic.com",
