@@ -115,6 +115,28 @@ auto_suggestions_provider = "claude",  -- Match the provider above
 - `<C-s>` - Submit AI prompt (insert mode)
 - `<Tab>` - Switch between AI windows
 
+### Git Operations
+- `]h` / `[h` - Navigate between git hunks (changes)
+- `<leader>hp` - Preview git hunk
+- `<leader>hs` - Stage git hunk
+- `<leader>hr` - Reset git hunk
+- `<leader>gg` - Open LazyGit interface
+- `<leader>gs` - Git status (Fugitive)
+- `<leader>gb` - Git blame
+
+### Git Conflict Resolution
+- `]x` / `[x` - Navigate between merge conflicts
+- `co` - Choose ours (current branch)
+- `ct` - Choose theirs (incoming branch)
+- `cb` - Choose both versions
+- `c0` - Choose none (delete conflict)
+- `<leader>gc` - List all conflicts in quickfix
+
+### Search and Replace Across Project
+- `<leader>fg` - Search term across project
+- `<C-q>` - Send Telescope results to quickfix
+- `:cfdo %s/old/new/gc | update` - Replace with confirmation
+
 ## 🛠️ Project-Specific Features
 
 ### Go Testing with Environment Variables
@@ -132,6 +154,52 @@ Tests will automatically load these variables.
 2. Start debugging with `<F5>` or `<leader>dgt` for tests
 3. Use `<F10>/<F11>/<F12>` to step through code
 4. Debug UI opens automatically with variables and call stack
+
+### Resolving Git Merge Conflicts
+When you encounter merge conflicts:
+
+1. **Visual Indicators**: Conflicts are highlighted with different colors
+   - Current (HEAD): Blue/purple highlighting
+   - Incoming: Green highlighting
+
+2. **Navigation**: Jump between conflicts
+   ```
+   ]x    # Next conflict
+   [x    # Previous conflict
+   ```
+
+3. **Resolution Options** (when cursor is on conflict):
+   ```
+   co    # Choose Ours - keep current branch version
+   ct    # Choose Theirs - accept incoming branch version
+   cb    # Choose Both - keep both versions
+   c0    # Choose None - delete entire conflict section
+   ```
+
+4. **Management Commands**:
+   ```
+   <leader>gc    # List all conflicts in quickfix
+   <leader>gr    # Refresh conflict detection
+   ```
+
+5. **Complete the merge** after resolving all conflicts:
+   ```bash
+   git add .
+   git commit
+   ```
+
+### Project-wide Search and Replace Workflow
+1. **Search**: `<leader>fg` and type your search term
+2. **Collect Results**: Press `<C-q>` to send all results to quickfix
+3. **Replace**: `:cfdo %s/oldword/newword/gc | update`
+   - `g` = replace all occurrences in each line
+   - `c` = ask for confirmation on each replacement
+   - `update` = save file if changed
+
+**Alternative without confirmation**:
+```vim
+:cfdo %s/oldword/newword/g | update
+```
 
 ## 📁 Project Structure
 

@@ -25,3 +25,4 @@ return {
 		vim.keymap.set("n", "<leader>gr", "<cmd>GitConflictRefresh<cr>", { desc = "Refresh git conflicts" })
 	end,
 }
+
