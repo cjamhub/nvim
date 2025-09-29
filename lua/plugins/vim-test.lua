@@ -15,10 +15,10 @@ return {
 					-- Change vim's working directory to where go.mod is
 					vim.cmd("lcd " .. path)
 
-					-- Check if .env.test exists in the same directory as go.mod
-					if vim.fn.filereadable(".env.test") == 1 then
-						-- Load .env.test before running tests
-						vim.g["test#go#gotest#executable"] = "set -a; . ./.env.test; set +a; go test"
+					-- Check if env exists in the same directory as go.mod
+					if vim.fn.filereadable("env") == 1 then
+						-- Load env before running tests
+						vim.g["test#go#gotest#executable"] = "set -a; . ./env; set +a; go test"
 					else
 						-- No .env.test, just use standard go test
 						vim.g["test#go#gotest#executable"] = "go test"
@@ -46,4 +46,3 @@ return {
 		-- To close the output window, just use :q or <C-w>q
 	end,
 }
-
