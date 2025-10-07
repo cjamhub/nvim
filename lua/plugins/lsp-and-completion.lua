@@ -70,6 +70,62 @@ return {
 							},
 						})
 					end,
+					-- Python LSP with venv support
+					pyright = function()
+						-- Function to find virtual environment folder in root directory
+						local function find_venv(workspace)
+							if not workspace then
+								return nil
+							end
+
+							-- Check for common venv directory names
+							for _, venv_name in ipairs({ "venv", ".venv", "env", ".env" }) do
+								local venv_path = workspace .. "/" .. venv_name
+								if vim.fn.isdirectory(venv_path) == 1 then
+									-- Check if Python executable exists
+									local python_path = venv_path .. "/bin/python3"
+									if vim.fn.executable(python_path) == 0 then
+										python_path = venv_path .. "/bin/python"
+									end
+									if vim.fn.executable(python_path) == 1 then
+										return venv_name
+									end
+								end
+							end
+
+							return nil
+						end
+
+						lspconfig.pyright.setup({
+							capabilities = caps,
+							root_dir = lspconfig.util.root_pattern(
+								"pyrightconfig.json",
+								"pyproject.toml",
+								"setup.py",
+								"setup.cfg",
+								"requirements.txt",
+								"Pipfile",
+								".git"
+							),
+							before_init = function(_, config)
+								-- Auto-detect venv in project root
+								local venv_name = find_venv(config.root_dir)
+								if venv_name then
+									config.settings.python.venvPath = config.root_dir
+									config.settings.python.venv = venv_name
+								end
+							end,
+							settings = {
+								python = {
+									analysis = {
+										autoSearchPaths = true,
+										useLibraryCodeForTypes = true,
+										diagnosticMode = "workspace",
+									},
+								},
+							},
+						})
+					end,
 				},
 			})
 		end,

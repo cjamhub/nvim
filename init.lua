@@ -32,6 +32,8 @@ vim.keymap.set("n", "<C-k>", ":tabnext<CR>")
 vim.keymap.set("n", "<C-j>", ":tabprev<CR>")
 
 require("config.lazy")
+require("config.python-venv") -- Auto-detect Python venv
+require("config.diagnostics") -- Better diagnostic display
 
 -- vim.o.background = "light"
 vim.opt.termguicolors = true
