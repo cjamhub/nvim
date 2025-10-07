@@ -9,6 +9,7 @@ return {
 				"gopls",
 				"solidity_ls",
 				"ts_ls",
+				"pyright", -- Python LSP
 			},
 		},
 		dependencies = {
@@ -21,6 +22,8 @@ return {
 						"stylua",
 						"prettier",
 						"delve",
+						"black", -- Python formatter
+						"ruff", -- Python linter
 					},
 				},
 			},
