@@ -6,12 +6,13 @@ A modern Neovim configuration with Go development focus, AI assistance, and debu
 
 ### 🔧 Core
 - **Plugin Manager**: [lazy.nvim](https://github.com/folke/lazy.nvim)
-- **LSP**: Go, Lua, Rust, TypeScript, Solidity support
+- **LSP**: Go, Python, Lua, Rust, TypeScript, Solidity support
 - **Completion**: nvim-cmp with LSP, buffer, and path sources
 - **Syntax Highlighting**: Treesitter with enhanced Go support
 
 ### 🧪 Testing & Debugging
 - **Go Testing**: vim-test with automatic go.mod detection
+- **Python Testing**: pytest with automatic venv/Poetry detection
 - **Debugging**: nvim-dap with Go debugging via Delve
 - **Environment Support**: Automatic .env.test loading for tests
 
@@ -39,6 +40,11 @@ go install github.com/go-delve/delve/cmd/dlv@latest
 
 # Install required tools
 npm install -g prettier  # For formatting
+
+# Python development (optional)
+# Mason will install pyright (LSP), black (formatter), and ruff (linter)
+# For Poetry support:
+curl -sSL https://install.python-poetry.org | python3 -
 ```
 
 ### Setup
@@ -86,8 +92,8 @@ auto_suggestions_provider = "claude",  -- Match the provider above
 ## ⚡ Key Bindings
 
 ### Testing
-- `,t` - Run nearest Go test
-- `,T` - Run all tests in file
+- `,t` - Run nearest test (Go/Python)
+- `,T` - Run all tests in file (Go/Python)
 
 ### Debugging
 - `<F5>` - Start/Continue debugging
@@ -109,6 +115,9 @@ auto_suggestions_provider = "claude",  -- Match the provider above
 - `<leader>rn` - Rename symbol
 - `<leader>ca` - Code actions
 - `gr` - Find references
+
+### Python Development
+- `<leader>pv` - Refresh Python venv detection (manual)
 
 ### AI (Avante)
 - `<CR>` - Submit AI prompt (normal mode)
@@ -138,6 +147,67 @@ auto_suggestions_provider = "claude",  -- Match the provider above
 - `:cfdo %s/old/new/gc | update` - Replace with confirmation
 
 ## 🛠️ Project-Specific Features
+
+### Python Development with Poetry
+
+This configuration automatically detects and uses Poetry-managed virtual environments.
+
+#### Initial Setup
+1. **Install Poetry** (if not already installed):
+   ```bash
+   curl -sSL https://install.python-poetry.org | python3 -
+   ```
+
+2. **Configure Poetry** (optional - to create venv in project):
+   ```bash
+   poetry config virtualenvs.in-project true
+   ```
+
+#### Using Poetry Projects
+1. **Create or activate Poetry environment**:
+   ```bash
+   cd your-poetry-project
+   poetry install  # Install dependencies
+   poetry shell    # Activate virtual environment
+   ```
+
+2. **Open Neovim**:
+   ```bash
+   nvim .
+   ```
+
+The configuration will automatically:
+- Detect `pyproject.toml` with `[tool.poetry]` section
+- Find Poetry's virtualenv using `poetry env info --path`
+- Configure pyright LSP to use Poetry's Python interpreter
+- Set up pytest to use Poetry's virtualenv
+
+#### Python Virtual Environment Detection Priority
+1. **Poetry projects**: Detected via `pyproject.toml` → uses `poetry env info`
+2. **Standard venv**: If `$VIRTUAL_ENV` is set, uses that
+3. **Local venv folders**: Searches for `venv/`, `.venv/`, `env/`, `.env/`
+4. **Fallback**: Uses system Python
+
+#### Python Testing with Poetry
+Tests automatically use Poetry's virtualenv:
+```bash
+# In a Poetry project:
+,t    # Run nearest test using Poetry's pytest
+,T    # Run all tests in file using Poetry's pytest
+```
+
+#### Manual Refresh
+If you change virtual environments, refresh the detection:
+```
+<leader>pv    # Or :PythonSetVenv
+```
+
+#### Python Diagnostics
+Diagnostics appear when cursor stops on an error line (300ms delay):
+- No inline virtual text (cleaner interface)
+- Floating window with error details
+- Error signs in gutter
+- Underlines on error lines
 
 ### Go Testing with Environment Variables
 Create `.env.test` in your project root (same directory as `go.mod`):

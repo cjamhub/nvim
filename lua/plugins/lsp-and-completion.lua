@@ -72,17 +72,51 @@ return {
 					end,
 					-- Python LSP with venv support
 					pyright = function()
+						-- Function to check if this is a Poetry project
+						local function is_poetry_project(dir)
+							local pyproject_path = dir .. "/pyproject.toml"
+							if vim.fn.filereadable(pyproject_path) == 1 then
+								local content = vim.fn.readfile(pyproject_path)
+								for _, line in ipairs(content) do
+									if line:match("%[tool%.poetry%]") then
+										return true
+									end
+								end
+							end
+							return false
+						end
+
+						-- Function to get Poetry virtualenv path
+						local function get_poetry_venv(dir)
+							local handle = io.popen("cd " .. dir .. " && poetry env info --path 2>/dev/null")
+							if handle then
+								local result = handle:read("*a")
+								handle:close()
+								if result and result ~= "" then
+									return result:gsub("%s+$", "")
+								end
+							end
+							return nil
+						end
+
 						-- Function to find virtual environment folder in root directory
 						local function find_venv(workspace)
 							if not workspace then
 								return nil
 							end
 
-							-- Check for common venv directory names
+							-- First, check if this is a Poetry project
+							if is_poetry_project(workspace) then
+								local poetry_venv = get_poetry_venv(workspace)
+								if poetry_venv then
+									return poetry_venv
+								end
+							end
+
+							-- Fall back to standard venv detection
 							for _, venv_name in ipairs({ "venv", ".venv", "env", ".env" }) do
 								local venv_path = workspace .. "/" .. venv_name
 								if vim.fn.isdirectory(venv_path) == 1 then
-									-- Check if Python executable exists
 									local python_path = venv_path .. "/bin/python3"
 									if vim.fn.executable(python_path) == 0 then
 										python_path = venv_path .. "/bin/python"
@@ -109,10 +143,17 @@ return {
 							),
 							before_init = function(_, config)
 								-- Auto-detect venv in project root
-								local venv_name = find_venv(config.root_dir)
-								if venv_name then
-									config.settings.python.venvPath = config.root_dir
-									config.settings.python.venv = venv_name
+								local venv_result = find_venv(config.root_dir)
+								if venv_result then
+									-- Check if it's a full path (Poetry) or just a name (standard venv)
+									if venv_result:match("^/") then
+										-- Full path (Poetry virtualenv)
+										config.settings.python.pythonPath = venv_result .. "/bin/python"
+									else
+										-- Relative path (standard venv)
+										config.settings.python.venvPath = config.root_dir
+										config.settings.python.venv = venv_result
+									end
 								end
 							end,
 							settings = {
