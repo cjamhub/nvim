@@ -72,63 +72,7 @@ return {
 					end,
 					-- Python LSP with venv support
 					pyright = function()
-						-- Function to check if this is a Poetry project
-						local function is_poetry_project(dir)
-							local pyproject_path = dir .. "/pyproject.toml"
-							if vim.fn.filereadable(pyproject_path) == 1 then
-								local content = vim.fn.readfile(pyproject_path)
-								for _, line in ipairs(content) do
-									if line:match("%[tool%.poetry%]") then
-										return true
-									end
-								end
-							end
-							return false
-						end
-
-						-- Function to get Poetry virtualenv path
-						local function get_poetry_venv(dir)
-							local handle = io.popen("cd " .. dir .. " && poetry env info --path 2>/dev/null")
-							if handle then
-								local result = handle:read("*a")
-								handle:close()
-								if result and result ~= "" then
-									return result:gsub("%s+$", "")
-								end
-							end
-							return nil
-						end
-
-						-- Function to find virtual environment folder in root directory
-						local function find_venv(workspace)
-							if not workspace then
-								return nil
-							end
-
-							-- First, check if this is a Poetry project
-							if is_poetry_project(workspace) then
-								local poetry_venv = get_poetry_venv(workspace)
-								if poetry_venv then
-									return poetry_venv
-								end
-							end
-
-							-- Fall back to standard venv detection
-							for _, venv_name in ipairs({ "venv", ".venv", "env", ".env" }) do
-								local venv_path = workspace .. "/" .. venv_name
-								if vim.fn.isdirectory(venv_path) == 1 then
-									local python_path = venv_path .. "/bin/python3"
-									if vim.fn.executable(python_path) == 0 then
-										python_path = venv_path .. "/bin/python"
-									end
-									if vim.fn.executable(python_path) == 1 then
-										return venv_name
-									end
-								end
-							end
-
-							return nil
-						end
+						local python_utils = require("utils.python")
 
 						lspconfig.pyright.setup({
 							capabilities = caps,
@@ -143,7 +87,7 @@ return {
 							),
 							before_init = function(_, config)
 								-- Auto-detect venv in project root
-								local venv_result = find_venv(config.root_dir)
+								local venv_result = python_utils.find_venv(config.root_dir)
 								if venv_result then
 									-- Check if it's a full path (Poetry) or just a name (standard venv)
 									if venv_result:match("^/") then

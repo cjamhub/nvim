@@ -2,6 +2,8 @@
 return {
 	"vim-test/vim-test",
 	config = function()
+		local python_utils = require("utils.python")
+
 		-- Configure vim-test
 		vim.g["test#strategy"] = "neovim"
 
@@ -30,42 +32,19 @@ return {
 			end
 		end
 
-		-- Function to check if this is a Poetry project
-		local function is_poetry_project()
-			local pyproject_path = vim.fn.getcwd() .. "/pyproject.toml"
-			if vim.fn.filereadable(pyproject_path) == 1 then
-				local content = vim.fn.readfile(pyproject_path)
-				for _, line in ipairs(content) do
-					if line:match("%[tool%.poetry%]") then
-						return true
-					end
-				end
-			end
-			return false
-		end
-
-		-- Function to get Poetry pytest executable
-		local function get_poetry_pytest()
-			local handle = io.popen("poetry env info --path 2>/dev/null")
-			if handle then
-				local result = handle:read("*a")
-				handle:close()
-				if result and result ~= "" then
-					local venv_path = result:gsub("%s+$", "")
-					return venv_path .. "/bin/pytest"
-				end
-			end
-			return nil
-		end
-
 		-- Function to setup Python test with venv
 		local function setup_python_test()
+			local cwd = vim.fn.getcwd()
+
 			-- First, check if this is a Poetry project
-			if is_poetry_project() then
-				local poetry_pytest = get_poetry_pytest()
-				if poetry_pytest and vim.fn.executable(poetry_pytest) == 1 then
-					vim.g["test#python#pytest#executable"] = poetry_pytest
-					return
+			if python_utils.is_poetry_project(cwd) then
+				local poetry_venv = python_utils.get_poetry_venv(cwd)
+				if poetry_venv then
+					local poetry_pytest = poetry_venv .. "/bin/pytest"
+					if vim.fn.executable(poetry_pytest) == 1 then
+						vim.g["test#python#pytest#executable"] = poetry_pytest
+						return
+					end
 				end
 			end
 
