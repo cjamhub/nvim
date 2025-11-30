@@ -37,3 +37,12 @@ require("lazy").setup({
 		frequency = 86400, -- check once per day when starting vim
 	},
 })
+
+-- Auto-update plugins on startup (runs after UI loads to avoid blocking)
+vim.api.nvim_create_autocmd("VimEnter", {
+	callback = function()
+		vim.defer_fn(function()
+			require("lazy").sync({ wait = false, show = false })
+		end, 100)
+	end,
+})
