@@ -1,4 +1,4 @@
--- Lightweight test runner for Go and Python
+-- Lightweight test runner for Go, Python, and Solidity
 return {
 	"vim-test/vim-test",
 	config = function()
@@ -14,6 +14,10 @@ return {
 		-- Python configuration
 		vim.g["test#python#runner"] = "pytest"
 		vim.g["test#python#pytest#options"] = "-v -s" -- -s shows print output
+
+		-- Solidity configuration (custom)
+		vim.g["test#custom_runners"] = { solidity = { "forge" } }
+		vim.g["test#solidity#forge#executable"] = "forge test"
 
 		-- Function to find and change to go.mod directory
 		local function setup_go_test_dir()
@@ -65,25 +69,97 @@ return {
 			end
 		end
 
-		-- Unified test keymaps that work for both Go and Python
+		-- Function to run Solidity test with Foundry
+		local function run_solidity_test(test_type)
+			-- Find the contract name from file content
+			local contract_name = nil
+			local lines = vim.fn.getline(1, "$")
+			for _, line in ipairs(lines) do
+				local match = line:match("contract%s+(%w+)%s+is")
+				if match then
+					contract_name = match
+					break
+				end
+			end
+
+			-- Fallback to filename if contract not found
+			if not contract_name then
+				contract_name = vim.fn.expand("%:t:r") -- Get filename without extension
+			end
+
+			-- Find foundry.toml to ensure we're in project root
+			local path = vim.fn.expand("%:p:h")
+			while path ~= "/" do
+				if vim.fn.filereadable(path .. "/foundry.toml") == 1 then
+					vim.cmd("lcd " .. path)
+					break
+				end
+				path = vim.fn.fnamemodify(path, ":h")
+			end
+
+			-- Run forge test with match pattern
+			local cmd
+			if test_type == "nearest" then
+				-- Search backwards from cursor to find the nearest function
+				local current_line = vim.fn.line(".")
+				local func_name = nil
+
+				-- Search current line first
+				local line_text = vim.fn.getline(current_line)
+				func_name = line_text:match("function%s+(%w+)")
+
+				-- If not found, search backwards
+				if not func_name then
+					for i = current_line - 1, 1, -1 do
+						line_text = vim.fn.getline(i)
+						func_name = line_text:match("function%s+(%w+)")
+						if func_name then
+							break
+						end
+						-- Stop if we hit another contract or reached too far
+						if line_text:match("contract%s+") or (current_line - i) > 50 then
+							break
+						end
+					end
+				end
+
+				if func_name then
+					cmd = "forge test --match-test " .. func_name .. " -vvvv"
+				else
+					cmd = "forge test --match-contract " .. contract_name .. " -vvvv"
+				end
+			else
+				cmd = "forge test --match-contract " .. contract_name .. " -vvvv"
+			end
+
+			vim.cmd("split | terminal " .. cmd)
+		end
+
+		-- Unified test keymaps that work for Go, Python, and Solidity
 		vim.keymap.set("n", ",t", function()
 			local filetype = vim.bo.filetype
 			if filetype == "go" then
 				setup_go_test_dir()
+				vim.cmd("TestNearest")
 			elseif filetype == "python" then
 				setup_python_test()
+				vim.cmd("TestNearest")
+			elseif filetype == "solidity" then
+				run_solidity_test("nearest")
 			end
-			vim.cmd("TestNearest")
 		end, { desc = "Run nearest test", silent = true })
 
 		vim.keymap.set("n", ",T", function()
 			local filetype = vim.bo.filetype
 			if filetype == "go" then
 				setup_go_test_dir()
+				vim.cmd("TestFile")
 			elseif filetype == "python" then
 				setup_python_test()
+				vim.cmd("TestFile")
+			elseif filetype == "solidity" then
+				run_solidity_test("file")
 			end
-			vim.cmd("TestFile")
 		end, { desc = "Run all tests in file", silent = true })
 		-- vim.keymap.set("n", ",a", ":TestSuite<CR>", { desc = "Run all tests", silent = true })
 		-- vim.keymap.set("n", ",l", ":TestLast<CR>", { desc = "Run last test", silent = true })
