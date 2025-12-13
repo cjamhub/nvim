@@ -43,6 +43,61 @@ return {
 							capabilities = caps,
 						})
 					end,
+					-- Rust analyzer specific configuration
+					rust_analyzer = function()
+						-- Custom root detection for Rust workspaces
+						local function find_workspace_root(fname)
+							local util = require("lspconfig.util")
+
+							-- First, try to find a workspace Cargo.toml
+							local workspace_root = util.root_pattern("Cargo.toml")(fname)
+							if workspace_root then
+								-- Check if this Cargo.toml has [workspace] section
+								local cargo_path = workspace_root .. "/Cargo.toml"
+								if vim.fn.filereadable(cargo_path) == 1 then
+									local content = vim.fn.readfile(cargo_path)
+									for _, line in ipairs(content) do
+										if line:match("^%[workspace%]") then
+											-- This is a workspace root
+											return workspace_root
+										end
+									end
+								end
+
+								-- Not a workspace, search parent directories
+								local current = vim.fn.fnamemodify(workspace_root, ":h")
+								while current ~= "/" do
+									cargo_path = current .. "/Cargo.toml"
+									if vim.fn.filereadable(cargo_path) == 1 then
+										content = vim.fn.readfile(cargo_path)
+										for _, line in ipairs(content) do
+											if line:match("^%[workspace%]") then
+												return current
+											end
+										end
+									end
+									current = vim.fn.fnamemodify(current, ":h")
+								end
+
+								-- No workspace found, use the nearest Cargo.toml
+								return workspace_root
+							end
+
+							return nil
+						end
+
+						lspconfig.rust_analyzer.setup({
+							capabilities = caps,
+							root_dir = find_workspace_root,
+							settings = {
+								["rust-analyzer"] = {
+									checkOnSave = {
+										command = "clippy",
+									},
+								},
+							},
+						})
+					end,
 					-- Solidity LSP specific configuration
 					solidity_ls = function()
 						lspconfig.solidity_ls.setup({
