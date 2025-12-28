@@ -23,6 +23,7 @@ secrets/
 keys/
 *.key
 *.secret
+db-connections.lua
 
 # OS generated files
 .DS_Store
@@ -37,6 +38,7 @@ Thumbs.db
 TODO.md
 NOTES.md
 scratch/
+db-connections.lua
 
 # Plugin data that shouldn't be shared
 .nvim/

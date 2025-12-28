@@ -16,6 +16,10 @@ A modern Neovim configuration with Go development focus, AI assistance, and debu
 - **Debugging**: nvim-dap with Go debugging via Delve
 - **Environment Support**: Automatic .env.test loading for tests
 
+### 🗄️ Database
+- **MySQL Queries**: vim-dadbod with a Nerd Font UI and helper keymaps
+- **SQL Completion**: Context-aware suggestions sourced from the active database
+
 ### 🤖 AI Assistance
 - **Avante.nvim**: AI-powered code assistance (Claude/OpenAI/Copilot)
 - **Image Support**: Paste images in AI conversations
@@ -270,6 +274,26 @@ When you encounter merge conflicts:
 ```vim
 :cfdo %s/oldword/newword/g | update
 ```
+
+### MySQL / Database Workflow
+1. **Store connections** in `~/.config/nvim/db-connections.lua` (already gitignored). The file must return a Lua table so secrets stay out of version control:
+   ```lua
+   return {
+     local_mysql = "mysql://user:pass@127.0.0.1:3306/app_db",
+     staging = os.getenv("STAGING_MYSQL_URL"),
+   }
+   ```
+
+2. **Open the database explorer** with `<leader>db`. The vim-dadbod UI lists connections, schemas, and helper queries for describing tables, indexes, and columns.
+
+3. **Manage connections on the fly**:
+   - `<leader>da` prompts for a one-off URL (handy for SSH tunnels or temporary creds)
+   - `<leader>df` jumps back to the buffer containing your last query result
+   - `:DB <url>` attaches the current SQL buffer to a connection without opening the UI
+
+4. **Run and debug queries** inside any `.sql` buffer. Use `:DB` or the UI to execute statements; results open in splits where you can re-run, yank rows, or use built-in table helpers. The config hides noisy MySQL internal schemas by default.
+
+5. **Enjoy completion**: SQL buffers (`sql`, `mysql`, `plsql`) use `vim-dadbod-completion`, so column/table names from the active connection show up in `nvim-cmp` suggestions as you type.
 
 ## 📁 Project Structure
 

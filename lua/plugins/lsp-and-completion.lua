@@ -241,6 +241,17 @@ return {
 				},
 			})
 
+			cmp.setup.filetype({ "sql", "mysql", "plsql" }, {
+				sources = cmp.config.sources({
+					{ name = "vim-dadbod-completion" },
+					{ name = "nvim_lsp" },
+					{ name = "luasnip" },
+				}, {
+					{ name = "buffer" },
+					{ name = "path" },
+				}),
+			})
+
 			-- 6) command line completion under '/'
 			cmp.setup.cmdline({ "/", "?" }, {
 				mapping = cmp.mapping.preset.cmdline(),
