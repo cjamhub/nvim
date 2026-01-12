@@ -40,6 +40,9 @@ NOTES.md
 scratch/
 db-connections.lua
 
+# Personal configuration (machine-specific settings)
+lua/personal/
+
 # Plugin data that shouldn't be shared
 .nvim/
 session/

@@ -12,6 +12,10 @@ return {
 	config = function()
 		local telescope = require("telescope")
 
+		-- Load personal config if it exists (gitignored)
+		local has_personal, personal = pcall(require, "personal.telescope")
+		local project_config = has_personal and personal.project or {}
+
 		telescope.setup({
 			defaults = {
 				path_display = { "smart" },
@@ -52,18 +56,7 @@ return {
 					override_generic_sorter = true,
 					override_file_sorter = true,
 				},
-				project = {
-					base_dirs = {
-						"~/Workspace/Jam/",
-						"~/Workspace/Durham/",
-						"~/Workspace/xHubs/",
-						"~/Workspace/Stakestone/",
-						"~/.config/nvim/",
-					},
-					order_by = "asc",
-					hidden_files = true,
-					search_by = "title",
-				},
+				project = project_config,
 			},
 		})
 
