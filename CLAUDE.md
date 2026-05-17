@@ -47,11 +47,12 @@ Colorscheme (`nord`) is set in `init.lua`, **not** in `lua/plugins/colourscheme.
 
 ## Current plugin scope (post-cleanup)
 
-After the Nov 2026 trim, the active plugin set is intentionally minimal — no git plugins (use external `git` / `lazygit`), no AI plugins, no inline terminal. If a request implies these features, ask before re-adding rather than assuming. Remaining plugins by file in `lua/plugins/`:
+After the May 2026 trim, the active plugin set is intentionally minimal — no AI plugins, no inline terminal, no full git porcelain (use external `git`). If a request implies a feature outside this set, ask before re-adding rather than assuming. Remaining plugins by file in `lua/plugins/`:
 
 - `lsp-and-completion.lua` — mason, nvim-lspconfig, nvim-cmp + sources, LuaSnip
 - `treesitter.lua`, `autopairs.lua`, `formatting.lua` (conform)
 - `telescope.lua` (+ fzf-native, project), `hop.lua`
+- `gitsigns.lua` (gutter hunks), `diffview.lua` (review diffs)
 - `vim-test.lua`, `nvim-dap.lua` (Go debug only)
 - `neorg.lua`, `markdown-preview.lua`
 - `colourscheme.lua` (nord only)

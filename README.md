@@ -20,6 +20,10 @@ A minimal Neovim configuration focused on Go / Python / Rust / Solidity / TypeSc
 - **Neorg**: org-style notes with daily journal and task management
 - **Markdown Preview**: browser preview with mermaid diagram support
 
+### 🔍 Git Review
+- **gitsigns.nvim**: gutter hunks, stage/reset/preview, blame
+- **diffview.nvim**: full-screen diff for reviewing AI-generated changes or any commit
+
 ### 🎨 UI & Navigation
 - **Telescope**: Fuzzy finder with project support
 - **Hop**: Fast cursor movement
@@ -106,6 +110,19 @@ curl -sSL https://install.python-poetry.org | python3 -
 
 ### Python Development
 - `<leader>pv` - Refresh Python venv detection (manual)
+
+### Git Review
+- `]h` / `[h` - Next / previous hunk
+- `<leader>hp` - Preview hunk
+- `<leader>hs` / `<leader>hr` - Stage / reset hunk (works on visual range too)
+- `<leader>hS` / `<leader>hR` - Stage / reset whole buffer
+- `<leader>hu` - Undo last stage
+- `<leader>hb` - Blame current line (full)
+- `<leader>hB` - Toggle inline blame
+- `<leader>hd` / `<leader>hD` - Diff against index / against HEAD~
+- `ih` - Hunk text object (e.g. `vih`, `dih`)
+- `<leader>gv` / `<leader>gV` - Open / close Diffview (working tree vs HEAD)
+- `<leader>gh` / `<leader>gH` - File history (current file / all)
 
 ### Notes (Neorg)
 - `<leader>tt` - Today's journal
@@ -223,6 +240,8 @@ Tests will automatically source these variables before running `go test`.
 │   │   ├── formatting.lua      # conform.nvim (format on save)
 │   │   ├── telescope.lua
 │   │   ├── hop.lua
+│   │   ├── gitsigns.lua
+│   │   ├── diffview.lua
 │   │   ├── vim-test.lua
 │   │   ├── nvim-dap.lua
 │   │   ├── neorg.lua
