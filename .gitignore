@@ -11,9 +11,6 @@
 *.backup
 *~
 
-# Lazy.nvim lock file (contains plugin versions)
-lazy-lock.json
-
 # Debug files
 *.dmp
 debug.log
