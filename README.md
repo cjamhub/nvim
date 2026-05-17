@@ -1,6 +1,6 @@
 # My Neovim Configuration
 
-A modern Neovim configuration with Go development focus, AI assistance, and debugging capabilities.
+A minimal Neovim configuration focused on Go / Python / Rust / Solidity / TypeScript development, with database and notes support.
 
 ## ✨ Features
 
@@ -8,28 +8,22 @@ A modern Neovim configuration with Go development focus, AI assistance, and debu
 - **Plugin Manager**: [lazy.nvim](https://github.com/folke/lazy.nvim)
 - **LSP**: Go, Python, Lua, Rust, TypeScript, Solidity support
 - **Completion**: nvim-cmp with LSP, buffer, and path sources
-- **Syntax Highlighting**: Treesitter with enhanced Go support
+- **Syntax Highlighting**: Treesitter
 
 ### 🧪 Testing & Debugging
-- **Go Testing**: vim-test with automatic go.mod detection
+- **Go Testing**: vim-test with automatic `go.mod` detection and `.env` loading
 - **Python Testing**: pytest with automatic venv/Poetry detection
+- **Solidity Testing**: Foundry `forge test` with contract/function matching
 - **Debugging**: nvim-dap with Go debugging via Delve
-- **Environment Support**: Automatic .env.test loading for tests
 
-### 🗄️ Database
-- **MySQL Queries**: vim-dadbod with a Nerd Font UI and helper keymaps
-- **SQL Completion**: Context-aware suggestions sourced from the active database
-
-### 🤖 AI Assistance
-- **Avante.nvim**: AI-powered code assistance (Claude/OpenAI/Copilot)
-- **Image Support**: Paste images in AI conversations
-- **Multiple Providers**: Easily switch between AI providers
+### 📝 Notes & Docs
+- **Neorg**: org-style notes with daily journal and task management
+- **Markdown Preview**: browser preview with mermaid diagram support
 
 ### 🎨 UI & Navigation
 - **Telescope**: Fuzzy finder with project support
-- **Git Integration**: Gitsigns for git status in gutter
 - **Hop**: Fast cursor movement
-- **Color Schemes**: Multiple themes (Catppuccin, Nord, Gruvbox, Solarized)
+- **Color Scheme**: Nord
 
 ## 📦 Installation
 
@@ -63,87 +57,65 @@ curl -sSL https://install.python-poetry.org | python3 -
    ```
    Plugins will auto-install on first launch.
 
-## 🔑 API Keys Setup
-
-### For AI Features (Avante)
-Choose one of the following providers:
-
-#### Option 1: Claude (Anthropic)
-```bash
-export ANTHROPIC_API_KEY="your-anthropic-api-key"
-```
-
-#### Option 2: OpenAI
-```bash
-export OPENAI_API_KEY="your-openai-api-key"
-```
-
-#### Option 3: GitHub Copilot
-- Requires GitHub Copilot subscription
-- Change provider in `lua/plugins/avante.lua`:
-  ```lua
-  provider = "copilot",
-  auto_suggestions_provider = "copilot",
-  ```
-
-### Switching AI Providers
-Edit `lua/plugins/avante.lua` and change:
-```lua
-provider = "claude",        -- Change to "openai" or "copilot"
-auto_suggestions_provider = "claude",  -- Match the provider above
-```
-
 ## ⚡ Key Bindings
 
 ### Testing
-- `,t` - Run nearest test (Go/Python)
-- `,T` - Run all tests in file (Go/Python)
+- `,t` - Run nearest test (Go/Python/Solidity)
+- `,T` - Run all tests in file (Go/Python/Solidity)
 
 ### Debugging
 - `<F5>` - Start/Continue debugging
 - `<F10>` - Step over
 - `<F11>` - Step into
 - `<F12>` - Step out
+- `<F7>` - Toggle debug UI
 - `<leader>b` - Toggle breakpoint
+- `<leader>B` - Conditional breakpoint
+- `<leader>dr` - Open REPL
+- `<leader>dt` - Terminate debug session
 - `<leader>dgt` - Debug Go test at cursor
+- `<leader>dgl` - Debug last Go test
 
 ### Navigation
 - `<leader>ff` - Find files
 - `<leader>fg` - Live grep
 - `<leader>fb` - Find buffers
-- `<space>` + motion - Hop to location
+- `<leader>fh` - Help tags
+- `<leader>fp` - Projects
+- `<leader>f.` - Recent files
+- `<leader>fc` - Diagnostics list
+- `<C-s>` - Fuzzy find in current buffer
+- `<leader><leader>` - Hop to word
 
 ### LSP
 - `gd` - Go to definition
+- `gD` - Go to declaration
+- `gi` - Go to implementation
+- `gr` - Find references
 - `K` - Hover documentation
 - `<leader>rn` - Rename symbol
 - `<leader>ca` - Code actions
-- `gr` - Find references
+
+### Diagnostics
+- `[d` / `]d` - Previous / next diagnostic
+- `<leader>d` - Show diagnostic in float
+- `<leader>q` - Open diagnostics list
+
+### Formatting
+- `<leader>f` - Format buffer (also runs automatically on save)
 
 ### Python Development
 - `<leader>pv` - Refresh Python venv detection (manual)
 
-### AI (Avante)
-- `<CR>` - Submit AI prompt (normal mode)
-- `<C-s>` - Submit AI prompt (insert mode)
-- `<Tab>` - Switch between AI windows
+### Notes (Neorg)
+- `<leader>tt` - Today's journal
+- `<leader>ty` - Yesterday's journal
+- `<leader>td` / `tu` / `th` / `tp` / `tc` / `ti` - Mark task done / undone / on-hold / pending / cancelled / important
 
-### Git Operations
-- `]h` / `[h` - Navigate between git hunks (changes)
-- `<leader>hp` - Preview git hunk
-- `<leader>hs` - Stage git hunk
-- `<leader>hr` - Reset git hunk
-- `<leader>gg` - Open LazyGit interface
-- `<leader>gs` - Git status (Fugitive)
-- `<leader>gb` - Git blame
-
-### Git Conflict Resolution
-- `]x` / `[x` - Navigate between merge conflicts
-- `co` - Choose ours (current branch)
-- `ct` - Choose theirs (incoming branch)
-- `cb` - Choose both versions
-- `c0` - Choose none (delete conflict)
-- `<leader>gc` - List all conflicts in quickfix
+### Markdown Preview
+- `<leader>mp` - Start markdown preview in browser
+- `<leader>ms` - Stop preview
+- `<leader>mt` - Toggle preview
 
 ### Search and Replace Across Project
 - `<leader>fg` - Search term across project
@@ -171,8 +143,8 @@ This configuration automatically detects and uses Poetry-managed virtual environ
 1. **Create or activate Poetry environment**:
    ```bash
    cd your-poetry-project
-   poetry install  # Install dependencies
-   poetry shell    # Activate virtual environment
+   poetry install
+   poetry shell
    ```
 
 2. **Open Neovim**:
@@ -192,14 +164,6 @@ The configuration will automatically:
 3. **Local venv folders**: Searches for `venv/`, `.venv/`, `env/`, `.env/`
 4. **Fallback**: Uses system Python
 
-#### Python Testing with Poetry
-Tests automatically use Poetry's virtualenv:
-```bash
-# In a Poetry project:
-,t    # Run nearest test using Poetry's pytest
-,T    # Run all tests in file using Poetry's pytest
-```
-
 #### Manual Refresh
 If you change virtual environments, refresh the detection:
 ```
@@ -214,53 +178,20 @@ Diagnostics appear when cursor stops on an error line (300ms delay):
 - Underlines on error lines
 
 ### Go Testing with Environment Variables
-Create `.env.test` in your project root (same directory as `go.mod`):
+Create `.env` in your project root (same directory as `go.mod`):
 ```bash
-# .env.test
+# .env
 DATABASE_URL=postgres://test:test@localhost/testdb
 API_KEY=test-key-123
 ```
 
-Tests will automatically load these variables.
+Tests will automatically source these variables before running `go test`.
 
 ### Debugging Go Applications
 1. Set breakpoints with `<leader>b`
 2. Start debugging with `<F5>` or `<leader>dgt` for tests
 3. Use `<F10>/<F11>/<F12>` to step through code
 4. Debug UI opens automatically with variables and call stack
-
-### Resolving Git Merge Conflicts
-When you encounter merge conflicts:
-
-1. **Visual Indicators**: Conflicts are highlighted with different colors
-   - Current (HEAD): Blue/purple highlighting
-   - Incoming: Green highlighting
-
-2. **Navigation**: Jump between conflicts
-   ```
-   ]x    # Next conflict
-   [x    # Previous conflict
-   ```
-
-3. **Resolution Options** (when cursor is on conflict):
-   ```
-   co    # Choose Ours - keep current branch version
-   ct    # Choose Theirs - accept incoming branch version
-   cb    # Choose Both - keep both versions
-   c0    # Choose None - delete entire conflict section
-   ```
-
-4. **Management Commands**:
-   ```
-   <leader>gc    # List all conflicts in quickfix
-   <leader>gr    # Refresh conflict detection
-   ```
-
-5. **Complete the merge** after resolving all conflicts:
-   ```bash
-   git add .
-   git commit
-   ```
 
 ### Project-wide Search and Replace Workflow
 1. **Search**: `<leader>fg` and type your search term
@@ -275,26 +206,6 @@ When you encounter merge conflicts:
 :cfdo %s/oldword/newword/g | update
 ```
 
-### MySQL / Database Workflow
-1. **Store connections** in `~/.config/nvim/db-connections.lua` (already gitignored). The file must return a Lua table so secrets stay out of version control:
-   ```lua
-   return {
-     local_mysql = "mysql://user:pass@127.0.0.1:3306/app_db",
-     staging = os.getenv("STAGING_MYSQL_URL"),
-   }
-   ```
-
-2. **Open the database explorer** with `<leader>db`. The vim-dadbod UI lists connections, schemas, and helper queries for describing tables, indexes, and columns.
-
-3. **Manage connections on the fly**:
-   - `<leader>da` prompts for a one-off URL (handy for SSH tunnels or temporary creds)
-   - `<leader>df` jumps back to the buffer containing your last query result
-   - `:DB <url>` attaches the current SQL buffer to a connection without opening the UI
-
-4. **Run and debug queries** inside any `.sql` buffer. Use `:DB` or the UI to execute statements; results open in splits where you can re-run, yank rows, or use built-in table helpers. The config hides noisy MySQL internal schemas by default.
-
-5. **Enjoy completion**: SQL buffers (`sql`, `mysql`, `plsql`) use `vim-dadbod-completion`, so column/table names from the active connection show up in `nvim-cmp` suggestions as you type.
-
 ## 📁 Project Structure
 
 ```
@@ -302,22 +213,32 @@ When you encounter merge conflicts:
 ├── init.lua                    # Entry point
 ├── lua/
 │   ├── config/
-│   │   └── lazy.lua           # Plugin manager setup
-│   └── plugins/               # Plugin configurations
-│       ├── avante.lua         # AI assistance
-│       ├── lsp-and-completion.lua  # LSP & completion
-│       ├── vim-test.lua       # Go testing
-│       ├── nvim-dap.lua       # Debugging
-│       ├── telescope.lua      # Fuzzy finder
-│       └── ...
-├── README.md                  # This file
-└── .gitignore                 # Security exclusions
+│   │   ├── lazy.lua            # Plugin manager setup
+│   │   ├── python-venv.lua     # Auto venv switching for pyright
+│   │   └── diagnostics.lua     # Diagnostic display config
+│   ├── plugins/                # Plugin configurations
+│   │   ├── lsp-and-completion.lua
+│   │   ├── treesitter.lua
+│   │   ├── autopairs.lua
+│   │   ├── formatting.lua      # conform.nvim (format on save)
+│   │   ├── telescope.lua
+│   │   ├── hop.lua
+│   │   ├── vim-test.lua
+│   │   ├── nvim-dap.lua
+│   │   ├── neorg.lua
+│   │   ├── markdown-preview.lua
+│   │   └── colourscheme.lua
+│   ├── utils/
+│   │   └── python.lua          # Shared Poetry / venv detection
+│   └── personal/               # Machine-local overrides (gitignored)
+├── README.md
+└── .gitignore
 ```
 
 ## 🔧 Customization
 
 ### Adding New Plugins
-Create a new file in `lua/plugins/` or add to existing files:
+Create a new file in `lua/plugins/`:
 ```lua
 -- lua/plugins/my-plugin.lua
 return {
@@ -328,15 +249,10 @@ return {
 }
 ```
 
-### Changing Themes
-Edit `lua/plugins/colourscheme.lua` and update the colorscheme name.
+### Changing Theme
+Add the colorscheme spec to `lua/plugins/colourscheme.lua`, then update the `vim.cmd.colorscheme(...)` call in `init.lua`.
 
 ## 🐛 Troubleshooting
-
-### AI Features Not Working
-1. Check API key is set: `echo $ANTHROPIC_API_KEY`
-2. Verify provider in `lua/plugins/avante.lua`
-3. Restart Neovim after changing API keys
 
 ### Go Debugging Not Working
 1. Ensure Delve is installed: `dlv version`
@@ -345,14 +261,6 @@ Edit `lua/plugins/colourscheme.lua` and update the colorscheme name.
 
 ### Tests Not Finding go.mod
 The configuration automatically searches upward for `go.mod` files, supporting monorepo structures.
-
-## 🤝 Contributing
-
-Feel free to fork and customize this configuration! If you add useful features, consider creating a pull request.
-
-## 📄 License
-
-This configuration is free to use and modify.
 
 ---
 
@@ -368,8 +276,9 @@ The LSP is a standardized JSON-RPC protocol that lets editors talk to language�
 ### Completion Engine
 A generic framework within Neovim that:
 - Lists candidate completions in a popup menu
-- Handles user navigation (<Tab>, <C-n>, <CR>)
+- Handles user navigation (`<Tab>`, `<C-n>`, `<CR>`)
 - Inserts the selected completion into the buffer
+
 It does not itself know about LSP or buffers or paths—you give it "sources."
 
 ### Completion Sources
@@ -377,5 +286,5 @@ Adapters that tell the completion engine where to look for suggestions:
 - LSP source (cmp-nvim-lsp): calls your language server
 - Buffer source (cmp-buffer): scans text in open buffers
 - Path source (cmp-path): completes filesystem paths
-- Cmdline source (cmp-cmdline): completes commands/ search in : and /
-- …plus extras: git branches, emoji, Neovim API, calculations, etc.
+- Cmdline source (cmp-cmdline): completes commands/search in `:` and `/`
+- vim-dadbod-completion: column/table names from the active DB connection
