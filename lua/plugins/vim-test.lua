@@ -9,7 +9,9 @@ return {
 
 		-- Go configuration
 		vim.g["test#go#runner"] = "gotest"
-		vim.g["test#go#gotest#options"] = "-v -race -count=1"
+		vim.g["test#go#gotest#options"] = {
+			all = "-v -race -count=1",
+		}
 
 		-- Python configuration
 		vim.g["test#python#runner"] = "pytest"
@@ -136,7 +138,7 @@ return {
 		end
 
 		-- Unified test keymaps that work for Go, Python, and Solidity
-		vim.keymap.set("n", ",t", function()
+		local function run_nearest_test()
 			local filetype = vim.bo.filetype
 			if filetype == "go" then
 				setup_go_test_dir()
@@ -147,9 +149,9 @@ return {
 			elseif filetype == "solidity" then
 				run_solidity_test("nearest")
 			end
-		end, { desc = "Run nearest test", silent = true })
+		end
 
-		vim.keymap.set("n", ",T", function()
+		local function run_file_tests()
 			local filetype = vim.bo.filetype
 			if filetype == "go" then
 				setup_go_test_dir()
@@ -160,7 +162,12 @@ return {
 			elseif filetype == "solidity" then
 				run_solidity_test("file")
 			end
-		end, { desc = "Run all tests in file", silent = true })
+		end
+
+		vim.keymap.set("n", ",t", run_nearest_test, { desc = "Run nearest test", silent = true })
+		vim.keymap.set("n", ",T", run_file_tests, { desc = "Run all tests in file", silent = true })
+		vim.keymap.set("n", "<leader>t", run_nearest_test, { desc = "Run nearest test", silent = true })
+		vim.keymap.set("n", "<leader>T", run_file_tests, { desc = "Run all tests in file", silent = true })
 		-- vim.keymap.set("n", ",a", ":TestSuite<CR>", { desc = "Run all tests", silent = true })
 		-- vim.keymap.set("n", ",l", ":TestLast<CR>", { desc = "Run last test", silent = true })
 

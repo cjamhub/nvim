@@ -64,8 +64,8 @@ curl -sSL https://install.python-poetry.org | python3 -
 ## ⚡ Key Bindings
 
 ### Testing
-- `,t` - Run nearest test (Go/Python/Solidity)
-- `,T` - Run all tests in file (Go/Python/Solidity)
+- `<leader>t` / `,t` - Run nearest test (Go/Python/Solidity)
+- `<leader>T` / `,T` - Run all tests in file (Go/Python/Solidity)
 
 ### Debugging
 - `<F5>` - Start/Continue debugging
