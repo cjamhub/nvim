@@ -71,6 +71,11 @@ curl -sSL https://install.python-poetry.org | python3 -
 ### Testing
 - `<leader>t` - Run nearest test (Go/Python/Rust/Solidity), output in a terminal split
 
+### Scratch Notes
+- `<leader>tt` - Open a fixed scratch file (`~/Workspace/Jam/notes/scratch.md`)
+
+> Note: `<leader>t` (run test) and `<leader>tt` (scratch file) share a prefix. Pressing `<leader>t` alone waits out `timeoutlen` before running, since Neovim needs to check whether a second `t` follows.
+
 ### Navigation
 - `<leader>ff` - Find files
 - `<leader>fg` - Live grep

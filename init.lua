@@ -31,6 +31,13 @@ vim.keymap.set("n", "<Leader>e", ":e%:h<CR>")
 vim.keymap.set("n", "<C-k>", ":tabnext<CR>")
 vim.keymap.set("n", "<C-j>", ":tabprev<CR>")
 
+-- fixed scratch file for quick notes
+vim.keymap.set("n", "<Leader>tt", function()
+	local scratch = vim.fn.expand("~/Workspace/Jam/notes/scratch.md")
+	vim.fn.mkdir(vim.fn.fnamemodify(scratch, ":h"), "p")
+	vim.cmd("edit " .. vim.fn.fnameescape(scratch))
+end, { desc = "Open scratch file" })
+
 require("config.lazy")
 require("config.python-venv") -- Auto-detect Python venv
 require("config.diagnostics") -- Better diagnostic display
