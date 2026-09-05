@@ -6,15 +6,16 @@ A minimal Neovim configuration focused on Go / Python / Rust / Solidity / TypeSc
 
 ### 🔧 Core
 - **Plugin Manager**: [lazy.nvim](https://github.com/folke/lazy.nvim)
-- **LSP**: Go, Python, Lua, Rust, TypeScript, Solidity support
-- **Completion**: nvim-cmp with LSP, buffer, and path sources
+- **LSP**: Go, Python (pyright + ruff), Lua, Rust (rustaceanvim), TypeScript, Solidity support
+- **Completion**: blink.cmp with LSP, buffer, path, and snippet sources
 - **Syntax Highlighting**: Treesitter
 
-### 🧪 Testing & Debugging
+### 🧪 Testing
 - **Go Testing**: vim-test with automatic `go.mod` detection and `.env` loading
 - **Python Testing**: pytest with automatic venv/Poetry detection
+- **Rust Testing**: `cargo test` via vim-test's `cargotest` runner
 - **Solidity Testing**: Foundry `forge test` with contract/function matching
-- **Debugging**: nvim-dap with Go debugging via Delve
+- One keymap for all four: `<leader>t` runs the test under the cursor
 
 ### 📝 Notes & Docs
 - **Neorg**: org-style notes with daily journal and task management
@@ -37,14 +38,19 @@ A minimal Neovim configuration focused on Go / Python / Rust / Solidity / TypeSc
 brew install neovim  # macOS
 # or apt install neovim  # Linux
 
-# Install Go debugger (for debugging support)
-go install github.com/go-delve/delve/cmd/dlv@latest
-
 # Install required tools
 npm install -g prettier  # For formatting
 
+# Rust development
+# rustaceanvim needs a working rustup toolchain; Mason keeps rust-analyzer updated
+rustup component add rust-analyzer
+
+# Solidity development
+# forge is used both for testing and for LSP remapping detection
+curl -L https://foundry.paradigm.xyz | bash && foundryup
+
 # Python development (optional)
-# Mason will install pyright (LSP), black (formatter), and ruff (linter)
+# Mason will install pyright (type checking) and ruff (format + lint)
 # For Poetry support:
 curl -sSL https://install.python-poetry.org | python3 -
 ```
@@ -64,21 +70,7 @@ curl -sSL https://install.python-poetry.org | python3 -
 ## ⚡ Key Bindings
 
 ### Testing
-- `<leader>t` / `,t` - Run nearest test (Go/Python/Solidity)
-- `<leader>T` / `,T` - Run all tests in file (Go/Python/Solidity)
-
-### Debugging
-- `<F5>` - Start/Continue debugging
-- `<F10>` - Step over
-- `<F11>` - Step into
-- `<F12>` - Step out
-- `<F7>` - Toggle debug UI
-- `<leader>b` - Toggle breakpoint
-- `<leader>B` - Conditional breakpoint
-- `<leader>dr` - Open REPL
-- `<leader>dt` - Terminate debug session
-- `<leader>dgt` - Debug Go test at cursor
-- `<leader>dgl` - Debug last Go test
+- `<leader>t` - Run nearest test (Go/Python/Rust/Solidity), output in a terminal split
 
 ### Navigation
 - `<leader>ff` - Find files
@@ -125,9 +117,9 @@ curl -sSL https://install.python-poetry.org | python3 -
 - `<leader>gh` / `<leader>gH` - File history (current file / all)
 
 ### Notes (Neorg)
-- `<leader>tt` - Today's journal
-- `<leader>ty` - Yesterday's journal
-- `<leader>td` / `tu` / `th` / `tp` / `tc` / `ti` - Mark task done / undone / on-hold / pending / cancelled / important
+- `<leader>tt` - Open today's journal (used as a scratch/draft page)
+
+> Note: `<leader>t` (run test) and `<leader>tt` (today's journal) share a prefix. Pressing `<leader>t` alone waits out `timeoutlen` before running, since Neovim needs to check whether a second `t` follows.
 
 ### Markdown Preview
 - `<leader>mp` - Start markdown preview in browser
@@ -204,11 +196,8 @@ API_KEY=test-key-123
 
 Tests will automatically source these variables before running `go test`.
 
-### Debugging Go Applications
-1. Set breakpoints with `<leader>b`
-2. Start debugging with `<F5>` or `<leader>dgt` for tests
-3. Use `<F10>/<F11>/<F12>` to step through code
-4. Debug UI opens automatically with variables and call stack
+### Solidity Remappings
+`lsp-and-completion.lua` runs `forge remappings` in the project root and feeds the result straight into `solidity_ls`, so import remapping (e.g. `@openzeppelin/=lib/openzeppelin-contracts/`) works for whatever dependencies the project actually uses — nothing is hardcoded to a specific library.
 
 ### Project-wide Search and Replace Workflow
 1. **Search**: `<leader>fg` and type your search term
@@ -243,7 +232,6 @@ Tests will automatically source these variables before running `go test`.
 │   │   ├── gitsigns.lua
 │   │   ├── diffview.lua
 │   │   ├── vim-test.lua
-│   │   ├── nvim-dap.lua
 │   │   ├── neorg.lua
 │   │   ├── markdown-preview.lua
 │   │   └── colourscheme.lua
@@ -273,11 +261,6 @@ Add the colorscheme spec to `lua/plugins/colourscheme.lua`, then update the `vim
 
 ## 🐛 Troubleshooting
 
-### Go Debugging Not Working
-1. Ensure Delve is installed: `dlv version`
-2. Check if `dlv` is in PATH: `which dlv`
-3. Verify Go treesitter is installed: `:TSInstall go`
-
 ### Tests Not Finding go.mod
 The configuration automatically searches upward for `go.mod` files, supporting monorepo structures.
 
@@ -301,9 +284,9 @@ A generic framework within Neovim that:
 It does not itself know about LSP or buffers or paths—you give it "sources."
 
 ### Completion Sources
-Adapters that tell the completion engine where to look for suggestions:
-- LSP source (cmp-nvim-lsp): calls your language server
-- Buffer source (cmp-buffer): scans text in open buffers
-- Path source (cmp-path): completes filesystem paths
-- Cmdline source (cmp-cmdline): completes commands/search in `:` and `/`
-- vim-dadbod-completion: column/table names from the active DB connection
+blink.cmp ships these built in, no separate packages needed:
+- `lsp`: calls your language server
+- `buffer`: scans text in open buffers
+- `path`: completes filesystem paths
+- `snippets`: expands vscode-style snippets (via `friendly-snippets`)
+- Cmdline completion (`:` and `/`) is handled by blink's own `cmdline` module

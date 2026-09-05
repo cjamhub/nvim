@@ -17,6 +17,7 @@ return {
 			lua = { "stylua" },
 			go = { "gofmt" },
 			rust = { "rustfmt" },
+			python = { "ruff_format" },
 			solidity = { "forge_fmt" },
 			json = { "prettier" },
 			javascript = { "prettier" },

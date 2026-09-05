@@ -1,17 +1,7 @@
 return {
-	-- 1) Mason for managing servers & lSP
+	-- 1) Mason for managing servers & LSP
 	{
 		"mason-org/mason-lspconfig.nvim",
-		opts = {
-			ensure_installed = {
-				"lua_ls",
-				"rust_analyzer",
-				"gopls",
-				"solidity_ls",
-				"ts_ls",
-				"pyright", -- Python LSP
-			},
-		},
 		dependencies = {
 			{ "mason-org/mason.nvim", opts = {} },
 			{ "neovim/nvim-lspconfig" },
@@ -21,249 +11,156 @@ return {
 					ensure_installed = {
 						"stylua",
 						"prettier",
-						"delve",
-						"black", -- Python formatter
-						"ruff", -- Python linter
+						"rust-analyzer", -- consumed by rustaceanvim, not mason-lspconfig
 					},
 				},
 			},
 		},
-		config = function(_, opts)
+		config = function()
 			require("mason").setup()
-			local mlsp = require("mason-lspconfig")
-			mlsp.setup(opts)
-			-- tell each server to use our shared capabilities
-			local lspconfig = require("lspconfig")
-			local caps = require("cmp_nvim_lsp").default_capabilities()
-			mlsp.setup({
-				-- default handler
-				handlers = {
-					function(server_name)
-						lspconfig[server_name].setup({
-							capabilities = caps,
-						})
-					end,
-					-- Rust analyzer specific configuration
-					rust_analyzer = function()
-						-- Custom root detection for Rust workspaces
-						local function find_workspace_root(fname)
-							local util = require("lspconfig.util")
 
-							-- First, try to find a workspace Cargo.toml
-							local workspace_root = util.root_pattern("Cargo.toml")(fname)
-							if workspace_root then
-								-- Check if this Cargo.toml has [workspace] section
-								local cargo_path = workspace_root .. "/Cargo.toml"
-								if vim.fn.filereadable(cargo_path) == 1 then
-									local content = vim.fn.readfile(cargo_path)
-									for _, line in ipairs(content) do
-										if line:match("^%[workspace%]") then
-											-- This is a workspace root
-											return workspace_root
-										end
-									end
-								end
+			-- Merged into every server's config (core vim.lsp.config wildcard)
+			vim.lsp.config("*", { capabilities = require("blink.cmp").get_lsp_capabilities() })
 
-								-- Not a workspace, search parent directories
-								local current = vim.fn.fnamemodify(workspace_root, ":h")
-								while current ~= "/" do
-									cargo_path = current .. "/Cargo.toml"
-									if vim.fn.filereadable(cargo_path) == 1 then
-										content = vim.fn.readfile(cargo_path)
-										for _, line in ipairs(content) do
-											if line:match("^%[workspace%]") then
-												return current
-											end
-										end
-									end
-									current = vim.fn.fnamemodify(current, ":h")
-								end
-
-								-- No workspace found, use the nearest Cargo.toml
-								return workspace_root
-							end
-
-							return nil
-						end
-
-						lspconfig.rust_analyzer.setup({
-							capabilities = caps,
-							root_dir = find_workspace_root,
-							settings = {
-								["rust-analyzer"] = {
-									checkOnSave = {
-										command = "clippy",
-									},
-								},
-							},
-						})
-					end,
-					-- Solidity LSP specific configuration
-					solidity_ls = function()
-						lspconfig.solidity_ls.setup({
-							capabilities = caps,
-							cmd = { "solidity-ls", "--stdio" },
-							filetypes = { "solidity" },
-							root_dir = require("lspconfig").util.root_pattern(
-								"hardhat.config.js",
-								"hardhat.config.ts",
-								"truffle-config.js",
-								"remappings.txt",
-								"truffle.js",
-								"foundry.toml",
-								".git"
-							),
-							settings = {
-								solidity = {
-									includePath = {
-										"node_modules",
-									},
-									remappings = {
-										["@openzeppelin"] = "node_modules/@openzeppelin",
-									},
-								},
-							},
-						})
-					end,
-					-- Python LSP with venv support
-					pyright = function()
-						local python_utils = require("utils.python")
-
-						lspconfig.pyright.setup({
-							capabilities = caps,
-							root_dir = lspconfig.util.root_pattern(
-								"pyrightconfig.json",
-								"pyproject.toml",
-								"setup.py",
-								"setup.cfg",
-								"requirements.txt",
-								"Pipfile",
-								".git"
-							),
-							before_init = function(_, config)
-								-- Auto-detect venv in project root
-								local venv_result = python_utils.find_venv(config.root_dir)
-								if venv_result then
-									-- Check if it's a full path (Poetry) or just a name (standard venv)
-									if venv_result:match("^/") then
-										-- Full path (Poetry virtualenv)
-										config.settings.python.pythonPath = venv_result .. "/bin/python"
-									else
-										-- Relative path (standard venv)
-										config.settings.python.venvPath = config.root_dir
-										config.settings.python.venv = venv_result
-									end
-								end
-							end,
-							settings = {
-								python = {
-									analysis = {
-										autoSearchPaths = true,
-										useLibraryCodeForTypes = true,
-										diagnosticMode = "workspace",
-									},
-								},
-							},
-						})
-					end,
+			require("mason-lspconfig").setup({
+				ensure_installed = {
+					"lua_ls",
+					"gopls",
+					"solidity_ls",
+					"ts_ls",
+					"pyright", -- Python type checking
+					"ruff", -- Python lint + import organizing
+				},
+				-- rust_analyzer is owned by rustaceanvim (mason-lspconfig would otherwise
+				-- auto-enable it too, purely because mason-tool-installer fetches the
+				-- rust-analyzer binary, producing a second misconfigured client).
+				-- pyright/ruff/solidity_ls get explicit vim.lsp.config + vim.lsp.enable
+				-- below instead of the bare defaults, so they're excluded here too.
+				automatic_enable = {
+					exclude = { "rust_analyzer", "pyright", "ruff", "solidity_ls", "solidity_ls_nomicfoundation" },
 				},
 			})
-		end,
-	},
 
-	-- 2) Completion engine + source
-	{
-		"hrsh7th/nvim-cmp",
-		dependencies = {
-			"hrsh7th/cmp-nvim-lsp",
-			"hrsh7th/cmp-buffer",
-			"hrsh7th/cmp-path",
-			"hrsh7th/cmp-cmdline",
-			"L3MON4D3/LuaSnip", -- optional
-			"saadparwaiz1/cmp_luasnip", -- optional
-		},
-		config = function()
-			local cmp = require("cmp")
-			local luasnip = require("luasnip")
-
-			cmp.setup({
-				-- 1) snippet
-				snippet = {
-					expand = function(args)
-						luasnip.lsp_expand(args.body)
-					end,
+			-- Solidity: cmd/filetypes/root_markers come from lspconfig's own default
+			-- (vscode-solidity-server, foundry.toml-aware). Remappings are pulled from
+			-- `forge remappings` on init so they aren't hardcoded to any one library
+			-- (e.g. openzeppelin).
+			vim.lsp.config("solidity_ls", {
+				settings = {
+					solidity = { includePath = { "node_modules" }, remappings = {} },
 				},
-
-				-- 2) keymap
-				mapping = cmp.mapping.preset.insert({
-					-- ["<C-l>"] = cmp.mapping.complete(),
-					["<C-f>"] = cmp.mapping.confirm({ select = true }),
-					["<Tab>"] = cmp.mapping(function(fallback)
-						if cmp.visible() then
-							cmp.select_next_item()
-						elseif luasnip.expand_or_jumpable() then
-							luasnip.expand_or_jump()
-						else
-							fallback()
+				on_init = function(client)
+					local remappings = {}
+					local handle = io.popen("cd " .. client.root_dir .. " && forge remappings 2>/dev/null")
+					if handle then
+						local output = handle:read("*a")
+						handle:close()
+						for line in output:gmatch("[^\r\n]+") do
+							local key, value = line:match("^(.-)=(.+)$")
+							if key and value then
+								remappings[key:gsub("/$", "")] = value:gsub("/$", "")
+							end
 						end
-					end, { "i", "s" }),
-					["<S-Tab>"] = cmp.mapping(function(fallback)
-						if cmp.visible() then
-							cmp.select_prev_item()
-						elseif luasnip.jumpable(-1) then
-							luasnip.jump(-1)
-						else
-							fallback()
-						end
-					end, { "i", "s" }),
-				}),
+					end
+					client.settings = vim.tbl_deep_extend("force", client.settings, {
+						solidity = { remappings = remappings },
+					})
+					client:notify("workspace/didChangeConfiguration", { settings = client.settings })
+				end,
+			})
+			vim.lsp.enable("solidity_ls")
 
-				-- 3) completion resources
-				sources = cmp.config.sources({
-					{ name = "nvim_lsp" },
-					{ name = "luasnip" },
-				}, {
-					{ name = "buffer" },
-					{ name = "path" },
-				}),
-
-				-- 4) pop-up window behaviour
-				completion = {
-					autocomplete = {
-						require("cmp.types").cmp.TriggerEvent.Insert,
-						require("cmp.types").cmp.TriggerEvent.TextChanged,
+			-- Python type checking, with venv support
+			local python_utils = require("utils.python")
+			vim.lsp.config("pyright", {
+				settings = {
+					python = {
+						analysis = {
+							autoSearchPaths = true,
+							useLibraryCodeForTypes = true,
+							diagnosticMode = "workspace",
+						},
 					},
 				},
-
-				-- 5) in-line preview
-				experimental = {
-					ghost_text = true,
-				},
+				before_init = function(_, config)
+					-- Auto-detect venv in project root
+					local venv_result = python_utils.find_venv(config.root_dir)
+					if venv_result then
+						-- Check if it's a full path (Poetry) or just a name (standard venv)
+						if venv_result:match("^/") then
+							-- Full path (Poetry virtualenv)
+							config.settings.python.pythonPath = venv_result .. "/bin/python"
+						else
+							-- Relative path (standard venv)
+							config.settings.python.venvPath = config.root_dir
+							config.settings.python.venv = venv_result
+						end
+					end
+				end,
 			})
+			vim.lsp.enable("pyright")
 
-			-- 6) command line completion under '/'
-			cmp.setup.cmdline({ "/", "?" }, {
-				mapping = cmp.mapping.preset.cmdline(),
-				sources = { { name = "buffer" } },
+			-- Python lint: defer hover to pyright, ruff only does diagnostics/actions
+			vim.lsp.config("ruff", {
+				on_attach = function(client)
+					client.server_capabilities.hoverProvider = false
+				end,
 			})
-
-			-- 7) command line completion under ':'
-			cmp.setup.cmdline(":", {
-				mapping = cmp.mapping.preset.cmdline(),
-				sources = cmp.config.sources({
-					{ name = "path" },
-				}, {
-					{ name = "cmdline" },
-				}),
-			})
+			vim.lsp.enable("ruff")
 		end,
 	},
 
-	vim.keymap.set("n", "gd", ":lua vim.lsp.buf.definition()<CR>", {}),
-	vim.keymap.set("n", "gD", ":lua vim.lsp.buf.declaration()<CR>", {}),
-	vim.keymap.set("n", "K", ":lua vim.lsp.buf.hover()<CR>", {}),
-	vim.keymap.set("n", "gi", ":lua vim.lsp.buf.implementation()<CR>", {}),
-	vim.keymap.set("n", "<leader>rn", ":lua vim.lsp.buf.rename()<CR>", {}),
-	vim.keymap.set("n", "<leader>ca", ":lua vim.lsp.buf.code_action()<CR>", {}),
-	vim.keymap.set("n", "gr", ":lua vim.lsp.buf.references()<CR>", {}),
+	-- 2) Rust: rustaceanvim owns its own LSP setup (workspace-aware root
+	-- detection out of the box, no hand-rolled Cargo.toml walking needed)
+	{
+		"mrcjkb/rustaceanvim",
+		version = "^6",
+		lazy = false,
+		ft = { "rust" },
+		init = function()
+			vim.g.rustaceanvim = {
+				server = {
+					capabilities = require("blink.cmp").get_lsp_capabilities(),
+					default_settings = {
+						["rust-analyzer"] = {
+							check = { command = "clippy" },
+						},
+					},
+				},
+			}
+		end,
+	},
+
+	-- 3) Completion engine
+	{
+		"saghen/blink.cmp",
+		version = "1.*",
+		dependencies = { "rafamadriz/friendly-snippets" },
+		opts = {
+			keymap = {
+				preset = "super-tab", -- Tab selects next/expands snippet, S-Tab reverses
+				["<C-f>"] = { "accept", "fallback" },
+			},
+			completion = {
+				documentation = { auto_show = true },
+				ghost_text = { enabled = true },
+			},
+			sources = {
+				default = { "lsp", "path", "buffer", "snippets" },
+			},
+			cmdline = {
+				enabled = true,
+			},
+			signature = { enabled = true },
+		},
+		opts_extend = { "sources.default" },
+	},
+
+	vim.keymap.set("n", "gd", vim.lsp.buf.definition, {}),
+	vim.keymap.set("n", "gD", vim.lsp.buf.declaration, {}),
+	vim.keymap.set("n", "K", vim.lsp.buf.hover, {}),
+	vim.keymap.set("n", "gi", vim.lsp.buf.implementation, {}),
+	vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, {}),
+	vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, {}),
+	vim.keymap.set("n", "gr", vim.lsp.buf.references, {}),
 }

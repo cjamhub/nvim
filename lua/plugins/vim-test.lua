@@ -1,4 +1,4 @@
--- Lightweight test runner for Go, Python, and Solidity
+-- Test runner for Go, Python, Rust, and Solidity: <leader>t runs the test under the cursor
 return {
 	"vim-test/vim-test",
 	config = function()
@@ -10,14 +10,18 @@ return {
 		-- Go configuration
 		vim.g["test#go#runner"] = "gotest"
 		vim.g["test#go#gotest#options"] = {
-			all = "-v -race -count=1",
+			nearest = "-v -race -count=1",
 		}
 
 		-- Python configuration
 		vim.g["test#python#runner"] = "pytest"
 		vim.g["test#python#pytest#options"] = "-v -s" -- -s shows print output
 
-		-- Solidity configuration (custom)
+		-- Rust configuration (cargo finds Cargo.toml upward on its own, no lcd needed)
+		vim.g["test#rust#runner"] = "cargotest"
+		vim.g["test#rust#cargotest#options"] = "-- --nocapture"
+
+		-- Solidity configuration (custom, see run_solidity_test below)
 		vim.g["test#custom_runners"] = { solidity = { "forge" } }
 		vim.g["test#solidity#forge#executable"] = "forge test"
 
@@ -71,8 +75,8 @@ return {
 			end
 		end
 
-		-- Function to run Solidity test with Foundry
-		local function run_solidity_test(test_type)
+		-- Function to run the nearest Solidity test with Foundry
+		local function run_solidity_test()
 			-- Find the contract name from file content
 			local contract_name = nil
 			local lines = vim.fn.getline(1, "$")
@@ -99,37 +103,32 @@ return {
 				path = vim.fn.fnamemodify(path, ":h")
 			end
 
-			-- Run forge test with match pattern
-			local cmd
-			if test_type == "nearest" then
-				-- Search backwards from cursor to find the nearest function
-				local current_line = vim.fn.line(".")
-				local func_name = nil
+			-- Search backwards from cursor to find the nearest function
+			local current_line = vim.fn.line(".")
+			local func_name = nil
 
-				-- Search current line first
-				local line_text = vim.fn.getline(current_line)
-				func_name = line_text:match("function%s+(%w+)")
+			-- Search current line first
+			local line_text = vim.fn.getline(current_line)
+			func_name = line_text:match("function%s+(%w+)")
 
-				-- If not found, search backwards
-				if not func_name then
-					for i = current_line - 1, 1, -1 do
-						line_text = vim.fn.getline(i)
-						func_name = line_text:match("function%s+(%w+)")
-						if func_name then
-							break
-						end
-						-- Stop if we hit another contract or reached too far
-						if line_text:match("contract%s+") or (current_line - i) > 50 then
-							break
-						end
+			-- If not found, search backwards
+			if not func_name then
+				for i = current_line - 1, 1, -1 do
+					line_text = vim.fn.getline(i)
+					func_name = line_text:match("function%s+(%w+)")
+					if func_name then
+						break
+					end
+					-- Stop if we hit another contract or reached too far
+					if line_text:match("contract%s+") or (current_line - i) > 50 then
+						break
 					end
 				end
+			end
 
-				if func_name then
-					cmd = "forge test --match-test " .. func_name .. " -vvvv"
-				else
-					cmd = "forge test --match-contract " .. contract_name .. " -vvvv"
-				end
+			local cmd
+			if func_name then
+				cmd = "forge test --match-test " .. func_name .. " -vvvv"
 			else
 				cmd = "forge test --match-contract " .. contract_name .. " -vvvv"
 			end
@@ -137,7 +136,7 @@ return {
 			vim.cmd("split | terminal " .. cmd)
 		end
 
-		-- Unified test keymaps that work for Go, Python, and Solidity
+		-- Unified keymap that dispatches by filetype
 		local function run_nearest_test()
 			local filetype = vim.bo.filetype
 			if filetype == "go" then
@@ -146,30 +145,14 @@ return {
 			elseif filetype == "python" then
 				setup_python_test()
 				vim.cmd("TestNearest")
+			elseif filetype == "rust" then
+				vim.cmd("TestNearest")
 			elseif filetype == "solidity" then
-				run_solidity_test("nearest")
+				run_solidity_test()
 			end
 		end
 
-		local function run_file_tests()
-			local filetype = vim.bo.filetype
-			if filetype == "go" then
-				setup_go_test_dir()
-				vim.cmd("TestFile")
-			elseif filetype == "python" then
-				setup_python_test()
-				vim.cmd("TestFile")
-			elseif filetype == "solidity" then
-				run_solidity_test("file")
-			end
-		end
-
-		vim.keymap.set("n", ",t", run_nearest_test, { desc = "Run nearest test", silent = true })
-		vim.keymap.set("n", ",T", run_file_tests, { desc = "Run all tests in file", silent = true })
 		vim.keymap.set("n", "<leader>t", run_nearest_test, { desc = "Run nearest test", silent = true })
-		vim.keymap.set("n", "<leader>T", run_file_tests, { desc = "Run all tests in file", silent = true })
-		-- vim.keymap.set("n", ",a", ":TestSuite<CR>", { desc = "Run all tests", silent = true })
-		-- vim.keymap.set("n", ",l", ":TestLast<CR>", { desc = "Run last test", silent = true })
 
 		-- The output will show in a terminal split
 		-- To close the output window, just use :q or <C-w>q
