@@ -35,7 +35,6 @@ Colorscheme (`nord`) is set in `init.lua`, **not** in `lua/plugins/colourscheme.
 - **Solidity remappings are detected at runtime.** `solidity_ls`'s `on_init` shells out to `forge remappings` in `client.root_dir` and pushes the result via `workspace/didChangeConfiguration` — nothing is hardcoded to a specific library, so it works across foundry projects with different dependencies. `cmd`/`filetypes`/root markers are left to lspconfig's own default (`vscode-solidity-server`) — don't hardcode `cmd` here, it drifts from whatever binary Mason actually installs (this broke once already).
 - **Go test env loading.** When the buffer is under a `go.mod`, the test runner `lcd`s into that directory and, if `.env` exists, prepends `set -a; . ./.env; set +a;` to the test executable. The README mentions `.env.test`, but the code reads `.env` — trust the code.
 - **Python lint/format is ruff, type-checking is pyright.** `conform.nvim` formats Python with `ruff_format` on save; the `ruff` LSP config disables its own `hoverProvider` in `on_attach` so pyright's hover wins, avoiding duplicate hover popups. `black` is intentionally not installed anymore.
-- **`<leader>t` and `<leader>tt` share a prefix.** vim-test's "run nearest test" is bound to `<leader>t`; neorg's daily-journal shortcut is `<leader>tt`. Pressing `<leader>t` alone waits out `timeoutlen` before firing, since Neovim has to see whether a second `t` is coming. This is expected, not a bug.
 - **Personal/machine-specific config goes in `lua/personal/`** (gitignored). `lua/plugins/telescope.lua` does `pcall(require, "personal.telescope")` for project base directories — absence is silently tolerated. Use the same `pcall` pattern when adding other host-specific overrides.
 - **`lazy-lock.json` is tracked** (since the "chore: track lazy-lock.json" commit) — it's the version pin, commit it along with plugin changes. The `lazy.nvim` checker runs daily (`frequency = 86400`).
 
@@ -59,8 +58,7 @@ After the September 2026 trim, the active plugin set is intentionally minimal �
 - `telescope.lua` (+ fzf-native, project), `hop.lua`
 - `gitsigns.lua` (gutter hunks), `diffview.lua` (review diffs)
 - `vim-test.lua` — Go/Python/Rust/Solidity, single `<leader>t` keymap
-- `neorg.lua` (daily-journal draft only), `markdown-preview.lua`
-- `colourscheme.lua` (nord only)
+- `markdown-preview.lua`, `colourscheme.lua` (nord only)
 
 ## README
 

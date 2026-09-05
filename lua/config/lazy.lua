@@ -36,9 +36,4 @@ require("lazy").setup({
 		notify = true,
 		frequency = 86400, -- check once per day when starting vim
 	},
-	-- Neorg's tree-sitter-norg is a luarocks package. Use lazy.nvim's bundled
-	-- hererocks so we don't have to install system lua 5.1 / luarocks.
-	rocks = {
-		hererocks = true,
-	},
 })

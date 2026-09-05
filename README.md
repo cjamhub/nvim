@@ -1,6 +1,6 @@
 # My Neovim Configuration
 
-A minimal Neovim configuration focused on Go / Python / Rust / Solidity / TypeScript development, with database and notes support.
+A minimal Neovim configuration focused on Go / Python / Rust / Solidity / TypeScript development.
 
 ## ✨ Features
 
@@ -17,8 +17,7 @@ A minimal Neovim configuration focused on Go / Python / Rust / Solidity / TypeSc
 - **Solidity Testing**: Foundry `forge test` with contract/function matching
 - One keymap for all four: `<leader>t` runs the test under the cursor
 
-### 📝 Notes & Docs
-- **Neorg**: org-style notes with daily journal and task management
+### 📝 Docs
 - **Markdown Preview**: browser preview with mermaid diagram support
 
 ### 🔍 Git Review
@@ -115,11 +114,6 @@ curl -sSL https://install.python-poetry.org | python3 -
 - `ih` - Hunk text object (e.g. `vih`, `dih`)
 - `<leader>gv` / `<leader>gV` - Open / close Diffview (working tree vs HEAD)
 - `<leader>gh` / `<leader>gH` - File history (current file / all)
-
-### Notes (Neorg)
-- `<leader>tt` - Open today's journal (used as a scratch/draft page)
-
-> Note: `<leader>t` (run test) and `<leader>tt` (today's journal) share a prefix. Pressing `<leader>t` alone waits out `timeoutlen` before running, since Neovim needs to check whether a second `t` follows.
 
 ### Markdown Preview
 - `<leader>mp` - Start markdown preview in browser
@@ -232,7 +226,6 @@ Tests will automatically source these variables before running `go test`.
 │   │   ├── gitsigns.lua
 │   │   ├── diffview.lua
 │   │   ├── vim-test.lua
-│   │   ├── neorg.lua
 │   │   ├── markdown-preview.lua
 │   │   └── colourscheme.lua
 │   ├── utils/
