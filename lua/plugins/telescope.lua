@@ -1,6 +1,6 @@
 return {
 	"nvim-telescope/telescope.nvim",
-	branch = "master", -- 0.1.8 tag is 3+ years stale; master is the actively maintained line now
+	branch = "master",
 	dependencies = {
 		"nvim-lua/plenary.nvim",
 		{

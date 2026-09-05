@@ -1,7 +1,3 @@
--- master branch only supports Neovim <= 0.11; main is required for 0.12+ and
--- has a different API: no more `.configs.setup()`/`ensure_installed`/
--- `highlight.enable` table -- parsers are installed explicitly and
--- highlighting is enabled per filetype via `vim.treesitter.start()`.
 local parsers = {
 	"lua",
 	"python",
@@ -18,7 +14,7 @@ return {
 	"nvim-treesitter/nvim-treesitter",
 	branch = "main",
 	build = ":TSUpdate",
-	lazy = false, -- this plugin does not support lazy-loading
+	lazy = false,
 	config = function()
 		require("nvim-treesitter").install(parsers)
 

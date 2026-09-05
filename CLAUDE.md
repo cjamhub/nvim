@@ -33,7 +33,7 @@ Colorscheme (`nord`) is set in `init.lua`, **not** in `lua/plugins/colourscheme.
 - **Rust is not wired through mason-lspconfig at all.** `mrcjkb/rustaceanvim` is its own plugin entry (configured via `vim.g.rustaceanvim`), owns workspace/root detection itself, and needs `check = { command = "clippy" }` (not the older `checkOnSave = { command = ... }` shape — that now errors on current rust-analyzer, which wants `checkOnSave` as a plain boolean).
 - **Solidity testing bypasses vim-test.** `lua/plugins/vim-test.lua` declares a custom `forge` runner but the `<leader>t` keymap dispatches on filetype and calls `run_solidity_test` directly for Solidity. It greps the buffer for `contract X is` / `function Y` and runs `forge test --match-test` or `--match-contract` in a terminal split. Editing the test keymap means updating the filetype dispatcher, not vim-test config.
 - **Solidity remappings are detected at runtime.** `solidity_ls`'s `on_init` shells out to `forge remappings` in `client.root_dir` and pushes the result via `workspace/didChangeConfiguration` — nothing is hardcoded to a specific library, so it works across foundry projects with different dependencies. `cmd`/`filetypes`/root markers are left to lspconfig's own default (`vscode-solidity-server`) — don't hardcode `cmd` here, it drifts from whatever binary Mason actually installs (this broke once already).
-- **Go test env loading.** When the buffer is under a `go.mod`, the test runner `lcd`s into that directory and, if `.env` exists, prepends `set -a; . ./.env; set +a;` to the test executable. The README mentions `.env.test`, but the code reads `.env` — trust the code.
+- **Go test env loading.** When the buffer is under a `go.mod`, the test runner `lcd`s into that directory and, if `.env` exists, prepends `set -a; . ./.env; set +a;` to the test executable.
 - **Python lint/format is ruff, type-checking is pyright.** `conform.nvim` formats Python with `ruff_format` on save; the `ruff` LSP config disables its own `hoverProvider` in `on_attach` so pyright's hover wins, avoiding duplicate hover popups. `black` is intentionally not installed anymore.
 - **`nvim-treesitter` tracks `branch = "main"`, not `master`.** `master` is frozen and only supports Neovim ≤0.11; `main` is a full rewrite required for Neovim 0.12+. The API is completely different: no `require('nvim-treesitter.configs').setup({ensure_installed=..., highlight={enable=true}})` — instead `treesitter.lua` calls `require('nvim-treesitter').install(parsers)` once and enables highlighting per filetype via a `FileType` autocmd calling `vim.treesitter.start()`. `main` also needs the external `tree-sitter` CLI (`brew install tree-sitter-cli` — the plain `tree-sitter` formula only ships the library now) to compile parsers; without it, `:TSUpdate`/`install()` fails with `ENOENT: tree-sitter`.
 - **`telescope.nvim` tracks `branch = "master"`, not the `0.1.8` tag.** The tag is years stale; master has been the de facto stable line for a long time. `require('telescope.builtin')` (used for all the `<leader>f*` keymaps) is unaffected by this — its picker API hasn't changed.
@@ -52,17 +52,19 @@ Colorscheme (`nord`) is set in `init.lua`, **not** in `lua/plugins/colourscheme.
 - `<leader>tt` (in `init.lua`) opens a fixed scratch file (`~/Workspace/Jam/notes/scratch.md`), creating the directory if needed. It shares a prefix with `<leader>t` (run nearest test) — pressing `<leader>t` alone waits out `timeoutlen` before firing, since Neovim has to see whether a second `t` is coming. This is expected, not a bug.
 - `.luarc.json` points lua-ls at `~/.local/share/nvim/lazy` so plugin Lua resolves during editing.
 
-## Current plugin scope (post-cleanup)
+## Plugin scope
 
-After the September 2026 trim, the active plugin set is intentionally minimal — no AI plugins, no inline terminal, no full git porcelain (use external `git`), no debugger. If a request implies a feature outside this set, ask before re-adding rather than assuming. Remaining plugins by file in `lua/plugins/`:
+Intentionally minimal — no AI plugins, no inline terminal, no full git porcelain (use external `git`), no debugger, no notes app. `ls lua/plugins/` for the current set; don't re-add something outside this scope without asking first.
 
-- `lsp-and-completion.lua` — mason, nvim-lspconfig, `rustaceanvim` (Rust), `blink.cmp` completion engine
-- `treesitter.lua`, `autopairs.lua`, `formatting.lua` (conform)
-- `telescope.lua` (+ fzf-native, project), `hop.lua`
-- `gitsigns.lua` (gutter hunks), `diffview.lua` (review diffs)
-- `vim-test.lua` — Go/Python/Rust/Solidity, single `<leader>t` keymap
-- `markdown-preview.lua`, `colourscheme.lua` (nord only)
+## New machine bootstrap
 
-## README
+```bash
+brew install neovim tree-sitter-cli   # nvim-treesitter main branch needs both
+npm install -g prettier
+rustup component add rust-analyzer     # rustaceanvim uses it
+curl -L https://foundry.paradigm.xyz | bash && foundryup   # forge, for Solidity
+curl -sSL https://install.python-poetry.org | python3 -    # optional, for Poetry projects
+```
+Then `git clone <repo> ~/.config/nvim && nvim` — plugins and Mason-managed LSP servers install on first launch.
 
-The repository's `README.md` is the user-facing docs (keymaps, setup, troubleshooting). When changing user-visible behavior — keymaps, plugin choices, supported languages — update the relevant `README.md` section too.
+There's no README.md — this file is the only doc, kept for whoever/whatever (mostly Claude) edits this repo next, not for a human onboarding audience. Keep entries here to genuinely non-obvious, hard-to-rediscover facts; skip anything a quick read of the code would tell you.
