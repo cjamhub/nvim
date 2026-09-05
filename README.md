@@ -33,12 +33,14 @@ A minimal Neovim configuration focused on Go / Python / Rust / Solidity / TypeSc
 
 ### Prerequisites
 ```bash
-# Install Neovim 0.10+
+# Install Neovim 0.12+ (required by nvim-treesitter's `main` branch)
 brew install neovim  # macOS
 # or apt install neovim  # Linux
 
 # Install required tools
 npm install -g prettier  # For formatting
+brew install tree-sitter-cli  # Parser compilation (nvim-treesitter main branch)
+# or: cargo install tree-sitter-cli  # non-macOS
 
 # Rust development
 # rustaceanvim needs a working rustup toolchain; Mason keeps rust-analyzer updated
