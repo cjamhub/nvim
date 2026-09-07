@@ -134,6 +134,6 @@ return {
 			end
 		end
 
-		vim.keymap.set("n", "<leader>t", run_nearest_test, { desc = "Run nearest test", silent = true })
+		vim.keymap.set("n", ",t", run_nearest_test, { desc = "Run nearest test", silent = true })
 	end,
 }
